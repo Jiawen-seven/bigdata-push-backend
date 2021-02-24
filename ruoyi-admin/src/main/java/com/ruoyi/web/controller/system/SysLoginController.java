@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import java.util.Set;
+
+import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +41,9 @@ public class SysLoginController
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private ISysUserService userService;
+
     /**
      * 登录方法
      * 
@@ -52,6 +57,10 @@ public class SysLoginController
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid());
+        SysUser user = userService.selectUserByUserName(loginBody.getUsername());
+        //因为登录逻辑过了之后，所以无需判空操作,主要是返回标识标定是系统用户还是前台用户
+        String flag = "bigdata-push".equals(user.getRemark())? "user":"system";
+        ajax.put("flag",flag);
         ajax.put(Constants.TOKEN, token);
         return ajax;
     }
