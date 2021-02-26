@@ -2,6 +2,9 @@ package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+
+import com.ruoyi.system.domain.SysUserRegistered;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -459,5 +462,45 @@ public class SysUserServiceImpl implements ISysUserService
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+    @Override
+    public int registeredUser(SysUserRegistered sysUserRegistered,int flag) {
+        SysUser sysUser = new SysUser();
+        sysUser.setUserName(sysUserRegistered.getName());
+        sysUser.setPassword(sysUserRegistered.getPassword());
+        sysUser.setNickName(sysUserRegistered.getName());
+        if(flag==1){
+            sysUser.setRemark("bigdata-push");
+        }
+        sysUser.setPhonenumber(sysUserRegistered.getPhone());
+        sysUser.setEmail(sysUserRegistered.getEmail());
+        //拼接字符串
+        StringJoiner joiner = new StringJoiner(",","","");
+        for(Long message:sysUserRegistered.getStockMessage()){
+            joiner.add(Long.toString(message));
+        }
+        sysUserRegistered.setStockMessages(joiner.toString());
+        joiner = new StringJoiner(",","","");
+        for(Long remind:sysUserRegistered.getStockRemind()){
+            joiner.add(Long.toString(remind));
+        }
+        sysUserRegistered.setStockReminds(joiner.toString());
+        int sysUserRows = userMapper.insertUser(sysUser);
+        if(sysUserRows>0){
+            sysUserRegistered.setUserId(selectUserByUserName(sysUser.getUserName()).getUserId());
+        }
+        int sysRegisterRows = userMapper.registeredUser(sysUserRegistered);
+        return sysRegisterRows>0 && sysUserRows>0? 1:0;
+    }
+
+    @Override
+    public List<SysUserRegistered> selectAllRegisteredUser() {
+        return userMapper.selectAllRegisteredUser();
+    }
+
+    @Override
+    public SysUserRegistered selectRegisteredUser(String userName) {
+        return userMapper.selectRegisteredUser(userName);
     }
 }

@@ -178,5 +178,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			#{userId}
         </foreach> 
  	</delete>
+	<!--注册方法-->
+	<insert id="registeredUser" parameterType="SysUserRegistered">
+		INSERT INTO sys_user_registered(user_id, stock_type, stock_messages, stock_time, stock_count, stock_reminds)
+		VALUES(#{userId},#{stockType},#{stockMessages},#{stockTime},#{stockCount},#{stockReminds})
+	</insert>
+	<!--查询所有注册用户-->
+	<select id="selectAllRegisteredUser" resultType="SysUserRegistered">
+		SELECT a.user_name name,a.phonenumber phone,a.email,a.remark,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
+		inner JOIN sys_user_registered b on a.user_id = b.user_id
+	</select>
+	<!--查询某个用户-->
+	<select id="selectRegisteredUser" parameterType="String" resultType="SysUserRegistered">
+		SELECT a.user_name name,a.phonenumber phone,a.email,a.remark,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
+		inner JOIN sys_user_registered b on a.user_id = b.user_id WHERE a.user_name = #{userName}
+	</select>
 	
 </mapper> 

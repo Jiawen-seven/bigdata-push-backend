@@ -3,6 +3,10 @@ package com.ruoyi.web.controller.system;
 import java.util.List;
 import java.util.Set;
 
+import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.domain.SysUserRegistered;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,6 +67,35 @@ public class SysLoginController
         ajax.put("flag",flag);
         ajax.put(Constants.TOKEN, token);
         return ajax;
+    }
+
+    /*
+    注册方法
+    */
+    @PostMapping("/registered")
+    public AjaxResult registered(@RequestBody SysUserRegistered sysUserRegistered){
+        SysUser sysUser = new SysUser();
+        sysUser.setUserName(sysUserRegistered.getName());
+        sysUser.setPhonenumber(sysUserRegistered.getPhone());
+        sysUser.setEmail(sysUserRegistered.getEmail());
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(sysUserRegistered.getName())))
+        {
+            return AjaxResult.error("新增用户'" + sysUserRegistered.getName() + "'失败，登录账号已存在");
+        }
+        else if (StringUtils.isNotEmpty(sysUser.getPhonenumber())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(sysUser)))
+        {
+            return AjaxResult.error("新增用户'" + sysUserRegistered.getName() + "'失败，手机号码已存在");
+        }
+        else if (StringUtils.isNotEmpty(sysUser.getEmail())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(sysUser)))
+        {
+            return AjaxResult.error("新增用户'" + sysUserRegistered.getName() + "'失败，邮箱账号已存在");
+        }
+        //加密密码
+        sysUserRegistered.setPassword(SecurityUtils.encryptPassword(sysUserRegistered.getPassword()));
+        int result = userService.registeredUser(sysUserRegistered,1);
+        return result>0 ? AjaxResult.success("注册成功"):AjaxResult.error("注册失败");
     }
 
     /**

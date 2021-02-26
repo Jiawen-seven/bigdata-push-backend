@@ -2,6 +2,8 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.system.domain.SysUserRegistered;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 用户 业务层
@@ -164,4 +166,15 @@ public interface ISysUserService
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /*
+    * 新增注册方法,0代表系统用户，1代表前台用户
+    * */
+    public int registeredUser(SysUserRegistered sysUserRegistered,int flag);
+
+    /*查询所有用户*/
+    public List<SysUserRegistered> selectAllRegisteredUser();
+
+    /*查询某个用户*/
+    public SysUserRegistered selectRegisteredUser(@Param("userName") String userName);
 }

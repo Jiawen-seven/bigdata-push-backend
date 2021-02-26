@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
+import com.ruoyi.system.domain.SysUserRegistered;
 import org.apache.ibatis.annotations.Param;
 import com.ruoyi.common.core.domain.entity.SysUser;
 
@@ -108,4 +110,15 @@ public interface SysUserMapper
      * @return 结果
      */
     public SysUser checkEmailUnique(String email);
+
+    /*
+    * 注册方法
+    * */
+    public int registeredUser(SysUserRegistered registered);
+
+    /*查询所有用户*/
+    public List<SysUserRegistered> selectAllRegisteredUser();
+
+    /*查询某个用户*/
+    public SysUserRegistered selectRegisteredUser(@Param("userName") String userName);
 }

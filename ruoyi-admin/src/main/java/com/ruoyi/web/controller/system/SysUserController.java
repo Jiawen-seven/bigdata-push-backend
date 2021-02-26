@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.ruoyi.system.domain.SysUserRegistered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -201,5 +203,22 @@ public class SysUserController extends BaseController
         userService.checkUserAllowed(user);
         user.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(userService.updateUserStatus(user));
+    }
+
+    /*
+    * 获取所有注册用户
+    * */
+    @GetMapping("/getAllRegisteredUser")
+    public AjaxResult getAllRegisteredUser(){
+        return AjaxResult.success(userService.selectAllRegisteredUser());
+    }
+
+    /*
+    * 获取某个注册用户的信息
+    * */
+    @GetMapping("/getRegisteredUser/{userName}")
+    public AjaxResult getRegisteredUser(@PathVariable String userName){
+        SysUserRegistered sysUserRegistered = userService.selectRegisteredUser(userName);
+        return sysUserRegistered==null? AjaxResult.error("不存在该用户"):AjaxResult.success(sysUserRegistered);
     }
 }
