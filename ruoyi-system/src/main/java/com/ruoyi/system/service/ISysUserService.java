@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.apache.ibatis.annotations.Param;
@@ -177,4 +179,7 @@ public interface ISysUserService
 
     /*查询某个用户*/
     public SysUserRegistered selectRegisteredUser(@Param("userName") String userName);
+
+    /*忘记密码操作*/
+    public AjaxResult forgetPwd(SysUser user);
 }

@@ -166,6 +166,16 @@ public class SysUserController extends BaseController
         user.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(userService.updateUser(user));
     }
+    /*忘记密码操作*/
+    @Log(title = "忘记密码", businessType = BusinessType.UPDATE)
+    @PostMapping("/forgetPwd")
+    public AjaxResult forgetPwd(@RequestBody SysUser user){
+        if (StringUtils.isNotEmpty(user.getPhonenumber())
+                && StringUtils.isNotEmpty(user.getPassword())){
+            return userService.forgetPwd(user);
+        }
+        return AjaxResult.error("参数缺失");
+    }
 
     /**
      * 删除用户

@@ -185,12 +185,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>
 	<!--查询所有注册用户-->
 	<select id="selectAllRegisteredUser" resultType="SysUserRegistered">
-		SELECT a.user_name name,a.phonenumber phone,a.email,a.remark,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
-		inner JOIN sys_user_registered b on a.user_id = b.user_id
+		SELECT a.user_id,a.user_name name,a.phonenumber phone,a.email,a.remark,a.avatar,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
+		inner JOIN sys_user_registered b on a.user_id = b.user_id WHERE a.remark = 'bigdata-push'
 	</select>
 	<!--查询某个用户-->
 	<select id="selectRegisteredUser" parameterType="String" resultType="SysUserRegistered">
-		SELECT a.user_name name,a.phonenumber phone,a.email,a.remark,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
+		SELECT a.user_id,a.user_name name,a.phonenumber phone,a.email,a.remark,a.avatar,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
 		inner JOIN sys_user_registered b on a.user_id = b.user_id WHERE a.user_name = #{userName}
 	</select>
 	

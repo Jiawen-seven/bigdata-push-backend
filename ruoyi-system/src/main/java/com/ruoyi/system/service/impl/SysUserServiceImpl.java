@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -502,5 +503,17 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public SysUserRegistered selectRegisteredUser(String userName) {
         return userMapper.selectRegisteredUser(userName);
+    }
+
+    @Override
+    public AjaxResult forgetPwd(SysUser user) {
+        SysUser sysUser = userMapper.checkPhoneUnique(user.getPhonenumber());
+        if(sysUser!=null){
+            sysUser.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+            sysUser.setUpdateBy(sysUser.getUserName());
+            return resetPwd(sysUser)==1? AjaxResult.success("重置密码成功"):AjaxResult.error("重置密码失败");
+        }else {
+            return AjaxResult.error("不存在该手机号");
+        }
     }
 }

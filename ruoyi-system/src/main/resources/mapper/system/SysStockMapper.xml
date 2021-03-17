@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysStockMapper">
+    
+    <resultMap type="SysStock" id="SysStockResult">
+        <result property="value"    column="value"    />
+        <result property="name"    column="name"    />
+    </resultMap>
+
+    <sql id="selectSysStockVo">
+        select value, name from sys_stock
+    </sql>
+
+    <select id="selectSysStockList" parameterType="SysStock" resultMap="SysStockResult">
+        <include refid="selectSysStockVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectSysStockById" parameterType="String" resultMap="SysStockResult">
+        <include refid="selectSysStockVo"/>
+        where value = #{value}
+    </select>
+        
+    <insert id="insertSysStock" parameterType="SysStock">
+        insert into sys_stock
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="value != null">value,</if>
+            <if test="name != null and name != ''">name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="value != null">#{value},</if>
+            <if test="name != null and name != ''">#{name},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysStock" parameterType="SysStock">
+        update sys_stock
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+        </trim>
+        where value = #{value}
+    </update>
+
+    <delete id="deleteSysStockById" parameterType="String">
+        delete from sys_stock where value = #{value}
+    </delete>
+
+    <delete id="deleteSysStockByIds" parameterType="String">
+        delete from sys_stock where value in 
+        <foreach item="value" collection="array" open="(" separator="," close=")">
+            #{value}
+        </foreach>
+    </delete>
+</mapper>
