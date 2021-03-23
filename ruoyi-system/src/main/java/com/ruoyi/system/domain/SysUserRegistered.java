@@ -1,6 +1,7 @@
 package com.ruoyi.system.domain;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.StringJoiner;
 
 /*
@@ -20,6 +21,7 @@ public class SysUserRegistered implements Serializable{
     private Long[] stockMessage;
     private Long[] stockRemind;
     private String remark;
+    private String avatar;
 
     public String getRemark() {
         return remark;
@@ -125,6 +127,14 @@ public class SysUserRegistered implements Serializable{
         this.stockRemind = stockRemind;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", SysUserRegistered.class.getSimpleName() + "[", "]")
@@ -138,7 +148,10 @@ public class SysUserRegistered implements Serializable{
                 .add("stockTime='" + stockTime + "'")
                 .add("stockCount='" + stockCount + "'")
                 .add("stockReminds='" + stockReminds + "'")
+                .add("stockMessage=" + Arrays.toString(stockMessage))
+                .add("stockRemind=" + Arrays.toString(stockRemind))
                 .add("remark='" + remark + "'")
+                .add("avatar='" + avatar + "'")
                 .toString();
     }
 }

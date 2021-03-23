@@ -167,6 +167,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<update id="resetUserPwd" parameterType="SysUser">
  		update sys_user set password = #{password} where user_name = #{userName}
 	</update>
+	<!--修改用户手机号和密码-->
+	<update id="editUser" parameterType="SysUser">
+ 		update sys_user set email = #{email} , phonenumber=#{phonenumber} where user_id = #{userId}
+	</update>
 	
 	<delete id="deleteUserById" parameterType="Long">
  		delete from sys_user where user_id = #{userId}
@@ -186,12 +190,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!--查询所有注册用户-->
 	<select id="selectAllRegisteredUser" resultType="SysUserRegistered">
 		SELECT a.user_id,a.user_name name,a.phonenumber phone,a.email,a.remark,a.avatar,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
-		inner JOIN sys_user_registered b on a.user_id = b.user_id WHERE a.remark = 'bigdata-push'
+		inner JOIN sys_user_registered b on a.user_id = b.user_id WHERE a.remark = 'bigdata-push' and a.del_flag = '0'
 	</select>
 	<!--查询某个用户-->
 	<select id="selectRegisteredUser" parameterType="String" resultType="SysUserRegistered">
 		SELECT a.user_id,a.user_name name,a.phonenumber phone,a.email,a.remark,a.avatar,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a
-		inner JOIN sys_user_registered b on a.user_id = b.user_id WHERE a.user_name = #{userName}
+		inner JOIN sys_user_registered b on a.user_id = b.user_id WHERE a.user_name = #{userName} and a.del_flag = '0'
 	</select>
+	<!--删除某个用户-->
+	<delete id="deleteRegisteredUser" parameterType="Long">
+		delete from sys_user_registered where user_id = #{userId}
+	</delete>
 	
 </mapper> 

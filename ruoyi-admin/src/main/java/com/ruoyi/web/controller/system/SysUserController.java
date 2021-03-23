@@ -1,20 +1,14 @@
 package com.ruoyi.web.controller.system;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
@@ -166,6 +160,25 @@ public class SysUserController extends BaseController
         user.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(userService.updateUser(user));
     }
+    /*修改用户信息*/
+    @Log(title = "修改用户信息", businessType = BusinessType.UPDATE)
+    @PutMapping("/editUser")
+    public AjaxResult editUser(@RequestBody SysUser user){
+        if (StringUtils.isNotEmpty(user.getPhonenumber())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
+        {
+            return AjaxResult.error("修改用户信息失败，手机号码已存在");
+        }
+        else if (StringUtils.isNotEmpty(user.getEmail())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
+        {
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+        else if ((user.getUserId())==null){
+            return AjaxResult.error("用户ID为空");
+        }
+        return userService.editUser(user)==1?AjaxResult.success("修改用户信息成功"):AjaxResult.error("修改用户信息失败");
+    }
     /*忘记密码操作*/
     @Log(title = "忘记密码", businessType = BusinessType.UPDATE)
     @PostMapping("/forgetPwd")
@@ -176,16 +189,28 @@ public class SysUserController extends BaseController
         }
         return AjaxResult.error("参数缺失");
     }
+    @Log(title = "修改密码", businessType = BusinessType.UPDATE)
+    @PostMapping("/editPwd")
+    public AjaxResult editPwd(@RequestBody Map<String,Object> map){
+        Long userId = Long.valueOf(map.get("userId").toString());
+        String password = map.get("password").toString();
+        String oldPassword = map.get("oldPassword").toString();
+        if(userId!=null && StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(oldPassword)){
+            return userService.editPwd(userId,password,oldPassword);
+        }else{
+            return AjaxResult.error("请求参数缺失");
+        }
+    }
 
     /**
      * 删除用户
      */
     @PreAuthorize("@ss.hasPermi('system:user:remove')")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{userIds}")
-    public AjaxResult remove(@PathVariable Long[] userIds)
+    @DeleteMapping("/{userId}")
+    public AjaxResult remove(@PathVariable Long userId)
     {
-        return toAjax(userService.deleteUserByIds(userIds));
+        return toAjax(userService.deleteUserById(userId));
     }
 
     /**

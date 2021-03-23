@@ -374,6 +374,7 @@ public class SysUserServiceImpl implements ISysUserService
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 删除用户与岗位表
         userPostMapper.deleteUserPostByUserId(userId);
+        userMapper.deleteRegisteredUser(userId);
         return userMapper.deleteUserById(userId);
     }
 
@@ -514,6 +515,25 @@ public class SysUserServiceImpl implements ISysUserService
             return resetPwd(sysUser)==1? AjaxResult.success("重置密码成功"):AjaxResult.error("重置密码失败");
         }else {
             return AjaxResult.error("不存在该手机号");
+        }
+    }
+
+    @Override
+    public int editUser(SysUser user) {
+        return userMapper.editUser(user);
+    }
+
+    @Override
+    public AjaxResult editPwd(Long userId,String password, String oldPassword) {
+        SysUser user = userMapper.selectUserById(userId);
+        System.out.println("数据库密码："+user.getPassword());
+        if(SecurityUtils.matchesPassword(oldPassword,user.getPassword())){
+            SysUser resetUserPwd = new SysUser();
+            resetUserPwd.setPassword(SecurityUtils.encryptPassword(password));
+            resetUserPwd.setUserId(userId);
+            return userMapper.updateUser(resetUserPwd)==1?AjaxResult.success("修改密码成功!"):AjaxResult.error("修改密码失败!");
+        }else{
+            return AjaxResult.error("密码不一致!");
         }
     }
 }

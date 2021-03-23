@@ -182,4 +182,10 @@ public interface ISysUserService
 
     /*忘记密码操作*/
     public AjaxResult forgetPwd(SysUser user);
+
+    /*修改用户信息*/
+    int editUser(SysUser user);
+
+    /*修改密码*/
+    AjaxResult editPwd(Long userId,String password,String oldPassword);
 }

@@ -121,4 +121,8 @@ public interface SysUserMapper
 
     /*查询某个用户*/
     public SysUserRegistered selectRegisteredUser(@Param("userName") String userName);
+    /*修改用户信息*/
+    int editUser(SysUser user);
+    /*删除用户注册信息*/
+    int deleteRegisteredUser(Long userId);
 }
