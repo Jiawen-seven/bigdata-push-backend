@@ -2,11 +2,14 @@ package com.ruoyi.web.controller.common;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.framework.web.service.SysPhoneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +33,10 @@ public class CommonController
 
     @Autowired
     private ServerConfig serverConfig;
+
+
+    @Autowired
+    private SysPhoneService sysPhoneService;
     /**
      * 通用下载请求
      * 
@@ -113,5 +120,10 @@ public class CommonController
         {
             log.error("下载文件失败", e);
         }
+    }
+    /*获取手机验证码*/
+    @PostMapping("/common/getCode/{phone}")
+    public AjaxResult getCode(@PathVariable String phone) throws Exception{
+        return sysPhoneService.sendSms(phone);
     }
 }

@@ -2,9 +2,11 @@ package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,9 @@ public class SysUserServiceImpl implements ISysUserService
 
     @Autowired
     private ISysConfigService configService;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 根据条件分页查询用户列表
@@ -509,6 +514,9 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public AjaxResult forgetPwd(SysUser user) {
         SysUser sysUser = userMapper.checkPhoneUnique(user.getPhonenumber());
+        if(redisCache.getCacheObject(user.getCode())==null){
+            return AjaxResult.error("验证码输入错误");
+        }
         if(sysUser!=null){
             sysUser.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
             sysUser.setUpdateBy(sysUser.getUserName());
@@ -520,7 +528,24 @@ public class SysUserServiceImpl implements ISysUserService
 
     @Override
     public int editUser(SysUser user) {
-        return userMapper.editUser(user);
+        int row = userMapper.editUser(user);
+        Map<String,Object> map = user.getParams();
+        //拼接字符串
+        for(String key:map.keySet()){
+            if("stockMessages".equals(key) || "stockReminds".equals(key)){
+                if(map.get(key)!=null){
+                    StringJoiner joiner = new StringJoiner(",","","");
+                    List<Integer> array = (List<Integer>) map.get(key);
+                    for(Integer a:array){
+                        joiner.add(Integer.toString(a));
+                    }
+                    map.put(key,joiner.toString());
+                }
+            }
+        }
+        map.put("userId",user.getUserId());
+        row += userMapper.updateRegisteredUser(user.getParams());
+        return row;
     }
 
     @Override

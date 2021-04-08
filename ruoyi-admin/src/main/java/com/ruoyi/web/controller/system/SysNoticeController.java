@@ -36,13 +36,19 @@ public class SysNoticeController extends BaseController
     /**
      * 获取通知公告列表
      */
-    @PreAuthorize("@ss.hasPermi('system:notice:list')")
+    /*@PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysNotice notice)
     {
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
         return getDataTable(list);
+    }*/
+
+    @GetMapping("/list")
+    public AjaxResult list(SysNotice notice){
+        List<SysNotice> list = noticeService.selectNoticeList(notice);
+        return AjaxResult.success(list);
     }
 
     /**
@@ -61,7 +67,7 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@Validated @RequestBody SysNotice notice)
+    public AjaxResult add(@RequestBody SysNotice notice)
     {
         notice.setCreateBy(SecurityUtils.getUsername());
         return toAjax(noticeService.insertNotice(notice));
@@ -84,9 +90,9 @@ public class SysNoticeController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{noticeIds}")
-    public AjaxResult remove(@PathVariable Long[] noticeIds)
+    @DeleteMapping("/{noticeId}")
+    public AjaxResult remove(@PathVariable Long noticeId)
     {
-        return toAjax(noticeService.deleteNoticeByIds(noticeIds));
+        return toAjax(noticeService.deleteNoticeById(noticeId));
     }
 }

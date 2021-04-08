@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.apache.ibatis.annotations.Param;
@@ -125,4 +126,6 @@ public interface SysUserMapper
     int editUser(SysUser user);
     /*删除用户注册信息*/
     int deleteRegisteredUser(Long userId);
+    /*修改注册信息*/
+    int updateRegisteredUser(Map<String,Object> sysUserRegistered);
 }

@@ -187,6 +187,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		INSERT INTO sys_user_registered(user_id, stock_type, stock_messages, stock_time, stock_count, stock_reminds)
 		VALUES(#{userId},#{stockType},#{stockMessages},#{stockTime},#{stockCount},#{stockReminds})
 	</insert>
+	<!--修改注册用户-->
+	<update id="updateRegisteredUser" parameterType="java.util.Map">
+		update sys_user_registered
+		<set>
+			<if test="stockType != null and stockType != 0">stock_type = #{stockType},</if>
+			<if test="stockMessages != null and stockMessages != ''">stock_messages = #{stockMessages},</if>
+			<if test="stockTime != null and stockTime != ''">stock_time = #{stockTime},</if>
+			<if test="stockCount != null and stockCount != ''">stock_count = #{stockCount},</if>
+			<if test="stockReminds != null and stockReminds != ''">stock_reminds = #{stockReminds},</if>
+		</set>
+		where user_id = #{userId}
+	</update>
 	<!--查询所有注册用户-->
 	<select id="selectAllRegisteredUser" resultType="SysUserRegistered">
 		SELECT a.user_id,a.user_name name,a.phonenumber phone,a.email,a.remark,a.avatar,b.stock_type,b.stock_time,b.stock_count,b.stock_messages,b.stock_reminds FROM sys_user a

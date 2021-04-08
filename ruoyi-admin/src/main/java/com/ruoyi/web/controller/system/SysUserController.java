@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.ruoyi.framework.web.service.SysPhoneService;
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -177,14 +178,15 @@ public class SysUserController extends BaseController
         else if ((user.getUserId())==null){
             return AjaxResult.error("用户ID为空");
         }
-        return userService.editUser(user)==1?AjaxResult.success("修改用户信息成功"):AjaxResult.error("修改用户信息失败");
+        return userService.editUser(user)>=1?AjaxResult.success("修改用户信息成功"):AjaxResult.error("修改用户信息失败");
     }
     /*忘记密码操作*/
     @Log(title = "忘记密码", businessType = BusinessType.UPDATE)
     @PostMapping("/forgetPwd")
     public AjaxResult forgetPwd(@RequestBody SysUser user){
         if (StringUtils.isNotEmpty(user.getPhonenumber())
-                && StringUtils.isNotEmpty(user.getPassword())){
+                && StringUtils.isNotEmpty(user.getPassword())
+                && StringUtils.isNotEmpty(user.getCode())){
             return userService.forgetPwd(user);
         }
         return AjaxResult.error("参数缺失");

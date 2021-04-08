@@ -106,6 +106,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                         "/**/*.js"
                 ).permitAll()
                 .antMatchers("/profile/**").anonymous()
+                .antMatchers("/common/getCode/**").anonymous()
+                .antMatchers("//system/user/editUser").anonymous()
                 .antMatchers("/common/download**").anonymous()
                 .antMatchers("/common/download/resource**").anonymous()
                 .antMatchers("/swagger-ui.html").anonymous()
