@@ -531,20 +531,22 @@ public class SysUserServiceImpl implements ISysUserService
         int row = userMapper.editUser(user);
         Map<String,Object> map = user.getParams();
         //拼接字符串
-        for(String key:map.keySet()){
-            if("stockMessages".equals(key) || "stockReminds".equals(key)){
-                if(map.get(key)!=null){
-                    StringJoiner joiner = new StringJoiner(",","","");
-                    List<Integer> array = (List<Integer>) map.get(key);
-                    for(Integer a:array){
-                        joiner.add(Integer.toString(a));
+        if(map!=null && map.size()>0){
+            for(String key:map.keySet()){
+                if("stockMessages".equals(key) || "stockReminds".equals(key)){
+                    if(map.get(key)!=null){
+                        StringJoiner joiner = new StringJoiner(",","","");
+                        List<Integer> array = (List<Integer>) map.get(key);
+                        for(Integer a:array){
+                            joiner.add(Integer.toString(a));
+                        }
+                        map.put(key,joiner.toString());
                     }
-                    map.put(key,joiner.toString());
                 }
             }
+            map.put("userId",user.getUserId());
+            row += userMapper.updateRegisteredUser(user.getParams());
         }
-        map.put("userId",user.getUserId());
-        row += userMapper.updateRegisteredUser(user.getParams());
         return row;
     }
 

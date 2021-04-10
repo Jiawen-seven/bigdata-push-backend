@@ -169,7 +169,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 	<!--修改用户手机号和密码-->
 	<update id="editUser" parameterType="SysUser">
- 		update sys_user set email = #{email} , phonenumber=#{phonenumber} where user_id = #{userId}
+ 		update sys_user
+ 		<set>
+ 			<if test="email!=null">
+				email = #{email},
+			</if>
+			<if test="phonenumber!=null">
+				phonenumber=#{phonenumber}
+			</if>
+		</set>
+		where user_id = #{userId}
 	</update>
 	
 	<delete id="deleteUserById" parameterType="Long">
@@ -195,7 +204,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="stockMessages != null and stockMessages != ''">stock_messages = #{stockMessages},</if>
 			<if test="stockTime != null and stockTime != ''">stock_time = #{stockTime},</if>
 			<if test="stockCount != null and stockCount != ''">stock_count = #{stockCount},</if>
-			<if test="stockReminds != null and stockReminds != ''">stock_reminds = #{stockReminds},</if>
+			<if test="stockReminds != null and stockReminds != ''">stock_reminds = #{stockReminds}</if>
 		</set>
 		where user_id = #{userId}
 	</update>
