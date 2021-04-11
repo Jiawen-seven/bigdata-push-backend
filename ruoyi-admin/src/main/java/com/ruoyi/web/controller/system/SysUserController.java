@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.ruoyi.framework.web.service.SysPhoneService;
+import com.ruoyi.system.domain.SysUserPush;
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -257,5 +258,13 @@ public class SysUserController extends BaseController
     public AjaxResult getRegisteredUser(@PathVariable String userName){
         SysUserRegistered sysUserRegistered = userService.selectRegisteredUser(userName);
         return sysUserRegistered==null? AjaxResult.error("不存在该用户"):AjaxResult.success(sysUserRegistered);
+    }
+    /*
+    * 获取推送消息
+    * */
+    @GetMapping("/getPushInfo/{userId}")
+    public AjaxResult getPushInfo(@PathVariable Long userId){
+        SysUserPush sysUserPush = userService.getPushInfo(userId);
+        return AjaxResult.success(sysUserPush);
     }
 }

@@ -2,8 +2,10 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.system.domain.SysUserPush;
 import com.ruoyi.system.domain.SysUserRegistered;
 import org.apache.ibatis.annotations.Param;
 
@@ -188,4 +190,10 @@ public interface ISysUserService
 
     /*修改密码*/
     AjaxResult editPwd(Long userId,String password,String oldPassword);
+    /*修改用户登录时间和登录次数*/
+    void updateLogin(SysUser sysUser);
+    /*
+    * 获取用户的推送信息
+    * */
+    SysUserPush getPushInfo(Long userId);
 }

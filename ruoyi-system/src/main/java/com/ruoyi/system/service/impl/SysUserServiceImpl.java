@@ -1,13 +1,16 @@
 package com.ruoyi.system.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.system.domain.SysUserRegistered;
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.system.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +23,6 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.system.domain.SysPost;
-import com.ruoyi.system.domain.SysUserPost;
-import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.SysPostMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
@@ -562,5 +562,37 @@ public class SysUserServiceImpl implements ISysUserService
         }else{
             return AjaxResult.error("密码不一致!");
         }
+    }
+
+    @Override
+    public void updateLogin(SysUser sysUser) {
+        if(sysUser.getLoginCount()==null){
+            System.out.println("登录次数:"+sysUser.getLoginCount());
+            sysUser.setLoginCount(1);
+        }
+        if(sysUser.getLoginDate()!=null){
+            AtomicInteger a = new AtomicInteger(sysUser.getLoginCount());
+            if(!DateUtils.isSameDay(sysUser.getLoginDate(),DateUtils.getNowDate())){
+                sysUser.setLoginCount(a.incrementAndGet());
+            }
+        }
+        sysUser.setLoginDate(DateUtils.getNowDate());
+        userMapper.updateUser(sysUser);
+    }
+
+    @Override
+    public SysUserPush getPushInfo(Long userId) {
+        SysUser sysUser = userMapper.selectUserById(userId);
+        SysUserPush sysUserPush = new SysUserPush(sysUser);
+        //计算活跃度,登录次数/（前面两个时间段相减)
+        long days = DateUtils.getDifferenceDays(sysUser.getLoginDate(),sysUser.getCreateTime());
+        double activity = (double)sysUserPush.getLoginCount()/days;
+        sysUserPush.setUserActivity(activity);
+        //距离最后登录天数
+        days = DateUtils.getDifferenceDays(DateUtils.getNowDate(),sysUser.getLoginDate());
+        sysUserPush.setDays((int) days);
+        //活跃度超过50%，距离最后登录超过14天，就视为需要召回的用户
+        sysUserPush.setRecall(activity > 0.5 && days > 14);
+        return sysUserPush;
     }
 }

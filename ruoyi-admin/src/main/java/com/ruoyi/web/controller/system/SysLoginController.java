@@ -62,6 +62,8 @@ public class SysLoginController
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid());
         SysUser user = userService.selectUserByUserName(loginBody.getUsername());
+        //更新登录时间和登录次数
+        userService.updateLogin(user);
         //因为登录逻辑过了之后，所以无需判空操作,主要是返回标识标定是系统用户还是前台用户
         String flag = "bigdata-push".equals(user.getRemark())? "user":"system";
         ajax.put("flag",flag);

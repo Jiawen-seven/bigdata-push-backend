@@ -94,6 +94,16 @@ public class SysUser extends BaseEntity
 
     private String code;
 
+    private Integer loginCount;
+
+    public Integer getLoginCount() {
+        return loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
+    }
+
     public SysUser()
     {
 
@@ -332,6 +342,7 @@ public class SysUser extends BaseEntity
                 .append("roleIds", roleIds)
                 .append("postIds", postIds)
                 .append("code", code)
+                .append("loginCount", loginCount)
                 .toString();
     }
 }
