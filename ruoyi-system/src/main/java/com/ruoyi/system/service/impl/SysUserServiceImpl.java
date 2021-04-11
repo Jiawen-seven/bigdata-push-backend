@@ -482,6 +482,8 @@ public class SysUserServiceImpl implements ISysUserService
         }
         sysUser.setPhonenumber(sysUserRegistered.getPhone());
         sysUser.setEmail(sysUserRegistered.getEmail());
+        sysUser.setLoginDate(DateUtils.getNowDate());
+        sysUser.setLoginCount(1);
         //拼接字符串
         StringJoiner joiner = new StringJoiner(",","","");
         for(Long message:sysUserRegistered.getStockMessage()){
@@ -581,18 +583,23 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     @Override
-    public SysUserPush getPushInfo(Long userId) {
-        SysUser sysUser = userMapper.selectUserById(userId);
-        SysUserPush sysUserPush = new SysUserPush(sysUser);
-        //计算活跃度,登录次数/（前面两个时间段相减)
-        long days = DateUtils.getDifferenceDays(sysUser.getLoginDate(),sysUser.getCreateTime());
-        double activity = (double)sysUserPush.getLoginCount()/days;
-        sysUserPush.setUserActivity(activity);
-        //距离最后登录天数
-        days = DateUtils.getDifferenceDays(DateUtils.getNowDate(),sysUser.getLoginDate());
-        sysUserPush.setDays((int) days);
-        //活跃度超过50%，距离最后登录超过14天，就视为需要召回的用户
-        sysUserPush.setRecall(activity > 0.5 && days > 14);
-        return sysUserPush;
+    public List<SysUserPush> getPushInfo() {
+        List<Long> userIds = userMapper.selectAllUser();
+        List<SysUserPush> sysUserPushList = new ArrayList<>();
+        for(Long userId:userIds){
+            SysUser sysUser = userMapper.selectUserById(userId);
+            SysUserPush sysUserPush = new SysUserPush(sysUser);
+            //计算活跃度,登录次数/（前面两个时间段相减)
+            long days = DateUtils.getDifferenceDays(sysUser.getLoginDate(),sysUser.getCreateTime());
+            double activity = (double)sysUserPush.getLoginCount()/days;
+            sysUserPush.setUserActivity(activity);
+            //距离最后登录天数
+            days = DateUtils.getDifferenceDays(DateUtils.getNowDate(),sysUser.getLoginDate());
+            sysUserPush.setDays((int) days);
+            //活跃度超过50%，距离最后登录超过14天，就视为需要召回的用户
+            sysUserPush.setRecall(activity > 0.5 && days > 14);
+            sysUserPushList.add(sysUserPush);
+        }
+        return sysUserPushList;
     }
 }

@@ -195,5 +195,5 @@ public interface ISysUserService
     /*
     * 获取用户的推送信息
     * */
-    SysUserPush getPushInfo(Long userId);
+    List<SysUserPush> getPushInfo();
 }

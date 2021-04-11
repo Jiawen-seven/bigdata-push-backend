@@ -128,4 +128,6 @@ public interface SysUserMapper
     int deleteRegisteredUser(Long userId);
     /*修改注册信息*/
     int updateRegisteredUser(Map<String,Object> sysUserRegistered);
+    /*获取所有用户id*/
+    List<Long> selectAllUser();
 }

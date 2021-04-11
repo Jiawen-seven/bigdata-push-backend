@@ -1,6 +1,10 @@
 package com.ruoyi.quartz.controller;
 
 import java.util.List;
+
+import com.ruoyi.common.constant.RequestConstants;
+import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.quartz.domain.SysQuote;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,6 +39,9 @@ public class SysJobController extends BaseController
 {
     @Autowired
     private ISysJobService jobService;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 查询定时任务列表
@@ -138,5 +145,19 @@ public class SysJobController extends BaseController
     {
         jobService.deleteJobByIds(jobIds);
         return AjaxResult.success();
+    }
+    /*
+    * 获取爬取的上证指数等数据
+    * */
+    @Log(title = "获取爬取的上证指数")
+    @GetMapping("/getQuotes")
+    public AjaxResult getQuotes(){
+        List<SysQuote> sysQuoteList = redisCache.getCacheList(RequestConstants.XUE_QIU_KEY);
+        if(sysQuoteList!=null){
+            return AjaxResult.success(sysQuoteList);
+        }else{
+            return AjaxResult.error("定时任务暂未爬取");
+        }
+
     }
 }

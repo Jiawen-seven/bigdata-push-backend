@@ -28,6 +28,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-http</artifactId>
+            <version>5.5.7</version>
+        </dependency>
 
         <!-- 通用工具-->
         <dependency>

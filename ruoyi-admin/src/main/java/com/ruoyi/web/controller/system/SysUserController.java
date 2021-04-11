@@ -262,9 +262,9 @@ public class SysUserController extends BaseController
     /*
     * 获取推送消息
     * */
-    @GetMapping("/getPushInfo/{userId}")
-    public AjaxResult getPushInfo(@PathVariable Long userId){
-        SysUserPush sysUserPush = userService.getPushInfo(userId);
-        return AjaxResult.success(sysUserPush);
+    @GetMapping("/getPushInfo")
+    public AjaxResult getPushInfo(){
+        List<SysUserPush> sysUserPushList = userService.getPushInfo();
+        return AjaxResult.success(sysUserPushList);
     }
 }
