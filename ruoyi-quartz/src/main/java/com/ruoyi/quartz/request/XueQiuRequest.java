@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class XueQiuRequest {
@@ -64,6 +63,7 @@ public class XueQiuRequest {
     public void getStockList(String market,String type){
         int counts = getCounts(market,type);
         int pages = counts%90==0 ? counts/90 : counts/90+1;
+        List<SysStockDay> sysStockDayList = new ArrayList<>();
         for(int page=1;page<=pages;page++){
             JSONObject obj = JSONObject.parseObject(getApiJson(getXueQiuListUrl(page,90,market,type)));
             JSONArray list = obj.getJSONObject("data").getJSONArray("list");
@@ -72,8 +72,12 @@ public class XueQiuRequest {
                 SysStockDay sysStockDay = JSONObject.parseObject(jsonObject.toJSONString(),SysStockDay.class);
                 sysStockDay.setCreateTime(new Date());
                 sysStockDayService.insertSysStockDay(sysStockDay);
+                sysStockDayList.add(sysStockDay);
             }
         }
+        redisCache.deleteObject(RequestConstants.XUE_QIU_STOCK_KEY);
+        //存入redis中
+        redisCache.setCacheList(RequestConstants.XUE_QIU_STOCK_KEY,sysStockDayList);
     }
 
     public void getQuote(){

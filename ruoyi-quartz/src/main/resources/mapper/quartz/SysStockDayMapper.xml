@@ -107,4 +107,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+    
+    <select id="selectSysStockByDay" parameterType="java.util.Map" resultMap="SysStockDayResult">
+        <include refid="selectSysStockDayVo"/>
+        <where>
+            <if test="startDateTime!=null and endDateTime!=null">
+                create_time between #{startDateTime} and #{endDateTime}
+            </if>
+        </where>
+    </select>
 </mapper>

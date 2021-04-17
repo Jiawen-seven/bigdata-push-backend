@@ -3,6 +3,8 @@ package com.ruoyi.common.utils;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -163,5 +165,12 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         long diff = endDate.getTime() - nowDate.getTime();
         // 计算差多少天
         return diff / nd;
+    }
+
+    public static LocalDate transferLocalDate(Date date) {
+        if(null == date) {
+            return null;
+        }
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

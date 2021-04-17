@@ -1,6 +1,7 @@
 package com.ruoyi.quartz.task;
 
 import com.ruoyi.quartz.request.XueQiuRequest;
+import com.ruoyi.quartz.service.ISysStockDayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.utils.StringUtils;
@@ -15,6 +16,9 @@ public class RyTask
 {
     @Autowired
     private XueQiuRequest xueQiuRequest;
+
+    @Autowired
+    private ISysStockDayService sysStockDayService;
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i)
     {
@@ -38,5 +42,11 @@ public class RyTask
     /*获取雪球网股票数据*/
     public void getXueQiuStock(){
         xueQiuRequest.getStockList("CN","sh_sz");
+    }
+    /*
+    * 定时更新基金榜
+    * */
+    public void getFundRanking(){
+        sysStockDayService.selectFundRanking();
     }
 }

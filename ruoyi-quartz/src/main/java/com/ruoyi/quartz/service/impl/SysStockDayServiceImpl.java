@@ -1,10 +1,19 @@
 package com.ruoyi.quartz.service.impl;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import com.ruoyi.common.constant.RequestConstants;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.quartz.domain.SysStockDay;
+import com.ruoyi.quartz.entity.FundRanking;
 import com.ruoyi.quartz.mapper.SysStockDayMapper;
 import com.ruoyi.quartz.service.ISysStockDayService;
+import com.ruoyi.quartz.util.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +28,9 @@ public class SysStockDayServiceImpl implements ISysStockDayService
 {
     @Autowired
     private SysStockDayMapper sysStockDayMapper;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 查询定时任务爬取股票数据
@@ -91,5 +103,75 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     public int deleteSysStockDayById(Long id)
     {
         return sysStockDayMapper.deleteSysStockDayById(id);
+    }
+
+    @Override
+    public Map<String,Object> getSysStockListByRedis(int pageSize, int pageNum) {
+        List<SysStockDay> sysStockDayList = redisCache.getCacheList(RequestConstants.XUE_QIU_STOCK_KEY);
+        if(sysStockDayList==null){
+            sysStockDayList = new ArrayList<>();
+        }
+        //分页
+        return PageUtils.getPage(sysStockDayList,pageNum,pageSize);
+    }
+
+    @Override
+    public void selectFundRanking() {
+        List<SysStockDay> sysStockDayList = redisCache.getCacheList(RequestConstants.XUE_QIU_STOCK_KEY);
+        if(sysStockDayList!=null && sysStockDayList.size()>0){
+            Calendar calendar = Calendar.getInstance();
+            Date dateBaseTime = sysStockDayList.get(0).getCreateTime();
+            calendar.setTime(dateBaseTime);
+            //获取过去七天
+            calendar.add(Calendar.DATE, - 7);
+            Date aWeekAgoDate = calendar.getTime();
+            LocalDate aWeekAgoLocalDate = DateUtils.transferLocalDate(aWeekAgoDate);
+            LocalDateTime startLocalDateTime = LocalDateTime.of(aWeekAgoLocalDate, LocalTime.MIN);
+            LocalDateTime endLocalDateTime = LocalDateTime.of(aWeekAgoLocalDate, LocalTime.MAX);
+            Map<String,Object> map = new HashMap<>();
+            map.put("startDateTime",startLocalDateTime);
+            map.put("endDateTime",endLocalDateTime);
+            List<SysStockDay> weekSysStockDayList = sysStockDayMapper.selectSysStockByDay(map);
+            List<FundRanking> fundRankingList = new ArrayList<>();
+            if(weekSysStockDayList==null || weekSysStockDayList.size()==0){
+                sysStockDayList.forEach(s->{
+                    FundRanking fundRanking  = new FundRanking();
+                    fundRanking.setName(s.getName());
+                    fundRanking.setSymbol(s.getSymbol());
+                    fundRanking.setTime("近一周");
+                    fundRanking.setFirstPercent("0");
+                    fundRankingList.add(fundRanking);
+                });
+            }else{
+                sysStockDayList.forEach(s->{
+                    FundRanking fundRanking  = new FundRanking();
+                    fundRanking.setName(s.getName());
+                    fundRanking.setSymbol(s.getSymbol());
+                    //获取一周前的股票数据对象
+                    SysStockDay filterObject = filterSysStockDay(weekSysStockDayList,s.getSymbol());
+                    fundRanking.setTime("近一周");
+                    fundRanking.setFirstPercent(computedPercent(filterObject.getCurrent(),s.getCurrent()));
+                    fundRankingList.add(fundRanking);
+                });
+            }
+            Collections.sort(fundRankingList);
+            redisCache.deleteObject(RequestConstants.XUE_QIU_FUND_RANK_KEY);
+            redisCache.setCacheList(RequestConstants.XUE_QIU_FUND_RANK_KEY,fundRankingList.subList(0,10));
+        }
+    }
+
+    public SysStockDay filterSysStockDay(List<SysStockDay> sysStockDayList,String symbol){
+        List<SysStockDay> filterList = sysStockDayList.stream().filter(s->s.getSymbol().equals(symbol)).collect(Collectors.toList());
+        if(filterList.size()>0){
+            return filterList.get(0);
+        }else{
+            return null;
+        }
+    }
+    public String computedPercent(String aWeekValue,String nowValue){
+        double week  = Double.parseDouble(aWeekValue);
+        double now = Double.parseDouble(nowValue);
+        double result = (now-week)/week*100;
+        return String.format("%.2f",result);
     }
 }

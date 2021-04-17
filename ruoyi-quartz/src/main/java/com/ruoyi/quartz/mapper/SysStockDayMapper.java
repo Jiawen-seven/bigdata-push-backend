@@ -2,7 +2,9 @@ package com.ruoyi.quartz.mapper;
 
 import com.ruoyi.quartz.domain.SysStockDay;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 定时任务爬取股票数据Mapper接口
@@ -27,6 +29,14 @@ public interface SysStockDayMapper
      * @return 定时任务爬取股票数据集合
      */
     public List<SysStockDay> selectSysStockDayList(SysStockDay sysStockDay);
+
+    /**
+     * 查询定时任务爬取股票数据列表
+     *
+     * @param
+     * @return 定时任务爬取股票数据集合
+     */
+    public List<SysStockDay> selectSysStockDayListByDate(Map<String,Object> map);
 
     /**
      * 新增定时任务爬取股票数据
@@ -59,4 +69,12 @@ public interface SysStockDayMapper
      * @return 结果
      */
     public int deleteSysStockDayByIds(Long[] ids);
+
+    /**
+    * @Description: 根据时间获取
+    * @param: [startDateTime, endDateTime]
+    * @return: java.util.List<com.ruoyi.quartz.domain.SysStockDay>
+    * @Date: 2021/4/17
+    */
+    public List<SysStockDay> selectSysStockByDay(Map<String,Object> map);
 }

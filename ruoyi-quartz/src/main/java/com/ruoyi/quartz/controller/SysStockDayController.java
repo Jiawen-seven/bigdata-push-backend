@@ -1,19 +1,16 @@
 package com.ruoyi.quartz.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import com.ruoyi.common.constant.RequestConstants;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.quartz.domain.SysStockDay;
+import com.ruoyi.quartz.entity.FundRanking;
 import com.ruoyi.quartz.service.ISysStockDayService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -34,6 +31,9 @@ public class SysStockDayController extends BaseController
     @Autowired
     private ISysStockDayService sysStockDayService;
 
+    @Autowired
+    private RedisCache redisCache;
+
     /**
      * 查询定时任务爬取股票数据列表
      */
@@ -44,6 +44,23 @@ public class SysStockDayController extends BaseController
         startPage();
         List<SysStockDay> list = sysStockDayService.selectSysStockDayList(sysStockDay);
         return getDataTable(list);
+    }
+    /*
+    * 获取当天爬取的股票数据
+    * */
+    @GetMapping("/getList")
+    public AjaxResult getSysStockListByRedis(
+            @RequestParam("pageSize") Integer pageSize,
+            @RequestParam("pageNum") Integer pageNum){
+        return AjaxResult.success(sysStockDayService.getSysStockListByRedis(pageSize,pageNum));
+    }
+    /*
+    * 获取基金排行榜
+    * */
+    @GetMapping("/getFundRanking")
+    public AjaxResult selectFundRanking(){
+        List<FundRanking> fundRankingList = redisCache.getCacheList(RequestConstants.XUE_QIU_FUND_RANK_KEY);
+        return AjaxResult.success(fundRankingList);
     }
 
     /**

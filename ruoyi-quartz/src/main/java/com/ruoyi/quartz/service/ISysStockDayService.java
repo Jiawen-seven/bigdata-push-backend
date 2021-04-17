@@ -1,8 +1,10 @@
 package com.ruoyi.quartz.service;
 
 import com.ruoyi.quartz.domain.SysStockDay;
+import com.ruoyi.quartz.entity.FundRanking;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 定时任务爬取股票数据Service接口
@@ -59,4 +61,20 @@ public interface ISysStockDayService
      * @return 结果
      */
     public int deleteSysStockDayById(Long id);
+    
+    /**
+    * @Description: 查询定时任务中爬取后存入的序列
+    * @param: []
+    * @return: java.util.List<com.ruoyi.quartz.domain.SysStockDay>
+    * @Date: 2021/4/17
+    */
+    public Map<String,Object> getSysStockListByRedis(int pageSize, int PageNum);
+    
+    /**
+    * @Description: 获取基金排行榜
+    * @param: []
+    * @return: java.util.List<com.ruoyi.quartz.entity.FundRanking>
+    * @Date: 2021/4/17
+    */
+    public void selectFundRanking();
 }
