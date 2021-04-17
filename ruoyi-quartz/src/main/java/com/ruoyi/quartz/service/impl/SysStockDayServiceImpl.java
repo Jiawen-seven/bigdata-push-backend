@@ -3,6 +3,7 @@ package com.ruoyi.quartz.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -106,13 +107,21 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     }
 
     @Override
-    public Map<String,Object> getSysStockListByRedis(int pageSize, int pageNum) {
-        List<SysStockDay> sysStockDayList = redisCache.getCacheList(RequestConstants.XUE_QIU_STOCK_KEY);
+    public List<SysStockDay> getSysStockListByRedisDate() {
+        String dateTime = redisCache.getCacheObject(RequestConstants.XUE_QIU_STOCK_KEY);
+
+        LocalDate localDate = LocalDate.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime startLocalDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
+        LocalDateTime endLocalDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
+        Map<String,Object> map = new HashMap<>();
+        map.put("startDateTime",startLocalDateTime);
+        map.put("endDateTime",endLocalDateTime);
+        List<SysStockDay> sysStockDayList = sysStockDayMapper.selectSysStockByDay(map);
         if(sysStockDayList==null){
             sysStockDayList = new ArrayList<>();
         }
         //分页
-        return PageUtils.getPage(sysStockDayList,pageNum,pageSize);
+        return sysStockDayList;
     }
 
     @Override
@@ -158,6 +167,11 @@ public class SysStockDayServiceImpl implements ISysStockDayService
             redisCache.deleteObject(RequestConstants.XUE_QIU_FUND_RANK_KEY);
             redisCache.setCacheList(RequestConstants.XUE_QIU_FUND_RANK_KEY,fundRankingList.subList(0,10));
         }
+    }
+
+    @Override
+    public int batchInsertSysStockDay(List<SysStockDay> sysStockDayList) {
+        return sysStockDayMapper.batchInsertSysStockDay(sysStockDayList);
     }
 
     public SysStockDay filterSysStockDay(List<SysStockDay> sysStockDayList,String symbol){

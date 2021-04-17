@@ -49,10 +49,10 @@ public class SysStockDayController extends BaseController
     * 获取当天爬取的股票数据
     * */
     @GetMapping("/getList")
-    public AjaxResult getSysStockListByRedis(
-            @RequestParam("pageSize") Integer pageSize,
-            @RequestParam("pageNum") Integer pageNum){
-        return AjaxResult.success(sysStockDayService.getSysStockListByRedis(pageSize,pageNum));
+    public TableDataInfo getSysStockListByRedis(){
+        startPage();
+        List<SysStockDay> list = sysStockDayService.getSysStockListByRedisDate();
+        return getDataTable(list);
     }
     /*
     * 获取基金排行榜

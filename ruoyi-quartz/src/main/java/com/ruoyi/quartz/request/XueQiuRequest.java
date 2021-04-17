@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -71,13 +72,13 @@ public class XueQiuRequest {
                 JSONObject jsonObject = list.getJSONObject(i);
                 SysStockDay sysStockDay = JSONObject.parseObject(jsonObject.toJSONString(),SysStockDay.class);
                 sysStockDay.setCreateTime(new Date());
-                sysStockDayService.insertSysStockDay(sysStockDay);
                 sysStockDayList.add(sysStockDay);
             }
         }
+        sysStockDayService.batchInsertSysStockDay(sysStockDayList);
         redisCache.deleteObject(RequestConstants.XUE_QIU_STOCK_KEY);
         //存入redis中
-        redisCache.setCacheList(RequestConstants.XUE_QIU_STOCK_KEY,sysStockDayList);
+        redisCache.setCacheObject(RequestConstants.XUE_QIU_STOCK_KEY, LocalDate.now().toString());
     }
 
     public void getQuote(){

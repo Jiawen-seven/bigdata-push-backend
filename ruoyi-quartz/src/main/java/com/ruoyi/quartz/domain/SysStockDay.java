@@ -62,7 +62,24 @@ public class SysStockDay extends BaseEntity
     @Excel(name = "市值")
     private String marketCapital;
 
-    public void setId(Long id) 
+    /*每股净资产*/
+    @Excel(name = "每股净资产")
+    private String volumeRatio;
+
+    /*全局唯一键*/
+    private String stockKey;
+
+
+
+    public String getVolumeRatio() {
+        return volumeRatio;
+    }
+
+    public void setVolumeRatio(String volumeRatio) {
+        this.volumeRatio = volumeRatio;
+    }
+
+    public void setId(Long id)
     {
         this.id = id;
     }
@@ -173,20 +190,20 @@ public class SysStockDay extends BaseEntity
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("symbol", getSymbol())
-            .append("name", getName())
-            .append("current", getCurrent())
-            .append("chg", getChg())
-            .append("firstPercent", getFirstPercent())
-            .append("currentYearPercent", getCurrentYearPercent())
-            .append("volume", getVolume())
-            .append("amount", getAmount())
-            .append("turnoverRate", getTurnoverRate())
-            .append("peTtm", getPeTtm())
-            .append("marketCapital", getMarketCapital())
-            .append("createTime", getCreateTime())
-            .toString();
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("symbol", symbol)
+                .append("name", name)
+                .append("current", current)
+                .append("chg", chg)
+                .append("firstPercent", firstPercent)
+                .append("currentYearPercent", currentYearPercent)
+                .append("volume", volume)
+                .append("amount", amount)
+                .append("turnoverRate", turnoverRate)
+                .append("peTtm", peTtm)
+                .append("marketCapital", marketCapital)
+                .append("volumeRatio", volumeRatio)
+                .toString();
     }
 }

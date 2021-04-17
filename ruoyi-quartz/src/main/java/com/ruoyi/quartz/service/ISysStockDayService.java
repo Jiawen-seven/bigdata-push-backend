@@ -68,7 +68,7 @@ public interface ISysStockDayService
     * @return: java.util.List<com.ruoyi.quartz.domain.SysStockDay>
     * @Date: 2021/4/17
     */
-    public Map<String,Object> getSysStockListByRedis(int pageSize, int PageNum);
+    public List<SysStockDay> getSysStockListByRedisDate();
     
     /**
     * @Description: 获取基金排行榜
@@ -77,4 +77,9 @@ public interface ISysStockDayService
     * @Date: 2021/4/17
     */
     public void selectFundRanking();
+
+    /*
+     * 批量插入
+     * */
+    public int batchInsertSysStockDay(List<SysStockDay> sysStockDayList);
 }

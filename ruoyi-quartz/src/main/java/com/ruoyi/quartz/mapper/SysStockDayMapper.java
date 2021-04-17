@@ -46,6 +46,11 @@ public interface SysStockDayMapper
      */
     public int insertSysStockDay(SysStockDay sysStockDay);
 
+    /*
+    * 批量插入
+    * */
+    public int batchInsertSysStockDay(List<SysStockDay> sysStockDayList);
+
     /**
      * 修改定时任务爬取股票数据
      * 
