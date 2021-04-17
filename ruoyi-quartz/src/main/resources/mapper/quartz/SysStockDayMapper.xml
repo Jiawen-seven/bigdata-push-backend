@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.quartz.mapper.SysStockDayMapper">
+    
+    <resultMap type="SysStockDay" id="SysStockDayResult">
+        <result property="id"    column="id"    />
+        <result property="symbol"    column="symbol"    />
+        <result property="name"    column="name"    />
+        <result property="current"    column="current"    />
+        <result property="chg"    column="chg"    />
+        <result property="firstPercent"    column="first_percent"    />
+        <result property="currentYearPercent"    column="current_year_percent"    />
+        <result property="volume"    column="volume"    />
+        <result property="amount"    column="amount"    />
+        <result property="turnoverRate"    column="turnover_rate"    />
+        <result property="peTtm"    column="pe_ttm"    />
+        <result property="marketCapital"    column="market_capital"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectSysStockDayVo">
+        select id, symbol, name, current, chg, first_percent, current_year_percent, volume, amount, turnover_rate, pe_ttm, market_capital, create_time from sys_stock_day
+    </sql>
+
+    <select id="selectSysStockDayList" parameterType="SysStockDay" resultMap="SysStockDayResult">
+        <include refid="selectSysStockDayVo"/>
+        <where>  
+            <if test="symbol != null  and symbol != ''"> and symbol = #{symbol}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="current != null  and current != ''"> and current = #{current}</if>
+            <if test="chg != null  and chg != ''"> and chg = #{chg}</if>
+            <if test="firstPercent != null  and firstPercent != ''"> and first_percent = #{firstPercent}</if>
+            <if test="currentYearPercent != null  and currentYearPercent != ''"> and current_year_percent = #{currentYearPercent}</if>
+            <if test="volume != null  and volume != ''"> and volume = #{volume}</if>
+            <if test="amount != null  and amount != ''"> and amount = #{amount}</if>
+            <if test="turnoverRate != null  and turnoverRate != ''"> and turnover_rate = #{turnoverRate}</if>
+            <if test="peTtm != null  and peTtm != ''"> and pe_ttm = #{peTtm}</if>
+            <if test="marketCapital != null  and marketCapital != ''"> and market_capital = #{marketCapital}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysStockDayById" parameterType="Long" resultMap="SysStockDayResult">
+        <include refid="selectSysStockDayVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysStockDay" parameterType="SysStockDay" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_stock_day
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="symbol != null and symbol != ''">symbol,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="current != null">current,</if>
+            <if test="chg != null">chg,</if>
+            <if test="firstPercent != null">first_percent,</if>
+            <if test="currentYearPercent != null">current_year_percent,</if>
+            <if test="volume != null">volume,</if>
+            <if test="amount != null">amount,</if>
+            <if test="turnoverRate != null">turnover_rate,</if>
+            <if test="peTtm != null">pe_ttm,</if>
+            <if test="marketCapital != null">market_capital,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="symbol != null and symbol != ''">#{symbol},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="current != null">#{current},</if>
+            <if test="chg != null">#{chg},</if>
+            <if test="firstPercent != null">#{firstPercent},</if>
+            <if test="currentYearPercent != null">#{currentYearPercent},</if>
+            <if test="volume != null">#{volume},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="turnoverRate != null">#{turnoverRate},</if>
+            <if test="peTtm != null">#{peTtm},</if>
+            <if test="marketCapital != null">#{marketCapital},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysStockDay" parameterType="SysStockDay">
+        update sys_stock_day
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="symbol != null and symbol != ''">symbol = #{symbol},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="current != null">current = #{current},</if>
+            <if test="chg != null">chg = #{chg},</if>
+            <if test="firstPercent != null">first_percent = #{firstPercent},</if>
+            <if test="currentYearPercent != null">current_year_percent = #{currentYearPercent},</if>
+            <if test="volume != null">volume = #{volume},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="turnoverRate != null">turnover_rate = #{turnoverRate},</if>
+            <if test="peTtm != null">pe_ttm = #{peTtm},</if>
+            <if test="marketCapital != null">market_capital = #{marketCapital},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysStockDayById" parameterType="Long">
+        delete from sys_stock_day where id = #{id}
+    </delete>
+
+    <delete id="deleteSysStockDayByIds" parameterType="String">
+        delete from sys_stock_day where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

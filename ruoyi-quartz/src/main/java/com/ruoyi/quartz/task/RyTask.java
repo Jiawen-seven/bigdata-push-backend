@@ -34,4 +34,9 @@ public class RyTask
     public void getXueQiuQuotes(){
         xueQiuRequest.mainGetQuote();
     }
+
+    /*获取雪球网股票数据*/
+    public void getXueQiuStock(){
+        xueQiuRequest.getStockList("CN","sh_sz");
+    }
 }

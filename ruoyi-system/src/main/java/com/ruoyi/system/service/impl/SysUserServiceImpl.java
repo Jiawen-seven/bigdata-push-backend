@@ -482,8 +482,8 @@ public class SysUserServiceImpl implements ISysUserService
         }
         sysUser.setPhonenumber(sysUserRegistered.getPhone());
         sysUser.setEmail(sysUserRegistered.getEmail());
-        sysUser.setLoginDate(DateUtils.getNowDate());
-        sysUser.setLoginCount(1);
+        sysUser.setLoginDate(null);
+        sysUser.setLoginCount(0);
         //拼接字符串
         StringJoiner joiner = new StringJoiner(",","","");
         for(Long message:sysUserRegistered.getStockMessage()){
@@ -590,12 +590,21 @@ public class SysUserServiceImpl implements ISysUserService
             SysUser sysUser = userMapper.selectUserById(userId);
             SysUserPush sysUserPush = new SysUserPush(sysUser);
             //计算活跃度,登录次数/（前面两个时间段相减)
-            long days = DateUtils.getDifferenceDays(sysUser.getLoginDate(),sysUser.getCreateTime());
-            double activity = (double)sysUserPush.getLoginCount()/days;
+            long days = 0;
+            if(sysUser.getLoginDate()!=null){
+                days = DateUtils.getDifferenceDays(sysUser.getLoginDate(),sysUser.getCreateTime())+1;
+            }
+            double activity = 0.0;
+            if(sysUserPush.getLoginCount()!=null && sysUserPush.getLoginCount()!=0){
+                activity = (double)sysUserPush.getLoginCount()/days;
+            }
             sysUserPush.setUserActivity(activity);
             //距离最后登录天数
-            days = DateUtils.getDifferenceDays(DateUtils.getNowDate(),sysUser.getLoginDate());
-            sysUserPush.setDays((int) days);
+            long last = 0;
+            if(sysUser.getLoginDate()!=null){
+                last = DateUtils.getDifferenceDays(DateUtils.getNowDate(),sysUser.getLoginDate());
+            }
+            sysUserPush.setDays((int) last);
             //活跃度超过50%，距离最后登录超过14天，就视为需要召回的用户
             sysUserPush.setRecall(activity > 0.5 && days > 14);
             sysUserPushList.add(sysUserPush);
