@@ -1,6 +1,7 @@
 package com.ruoyi.quartz.mapper;
 
 import com.ruoyi.quartz.domain.SysStockDay;
+import com.ruoyi.quartz.domain.VolumeRatioEps;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,4 +83,23 @@ public interface SysStockDayMapper
     * @Date: 2021/4/17
     */
     public List<SysStockDay> selectSysStockByDay(Map<String,Object> map);
+    
+    /**
+    * @Description: 获取id和symbol
+    * @param: [map]
+    * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+    * @Date: 2021/4/18
+    */
+    public List<Map<String,Object>> selectSysStockMap(Map<String,Object> map);
+
+    /*
+    * 更新每股净资产收益率和每股收益
+    *
+    * */
+    public void updateVolumeRatioEps(VolumeRatioEps map);
+
+    /*
+    * 批量更新每股净资产收益率和每股收益
+    * */
+    void batchUpdateVolumeRatioEps(List<VolumeRatioEps> mapList);
 }

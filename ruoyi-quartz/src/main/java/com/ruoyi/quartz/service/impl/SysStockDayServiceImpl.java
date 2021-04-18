@@ -11,6 +11,7 @@ import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.quartz.domain.SysStockDay;
+import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.entity.FundRanking;
 import com.ruoyi.quartz.mapper.SysStockDayMapper;
 import com.ruoyi.quartz.service.ISysStockDayService;
@@ -109,7 +110,6 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     @Override
     public List<SysStockDay> getSysStockListByRedisDate() {
         String dateTime = redisCache.getCacheObject(RequestConstants.XUE_QIU_STOCK_KEY);
-
         LocalDate localDate = LocalDate.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime startLocalDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
         LocalDateTime endLocalDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
@@ -148,7 +148,7 @@ public class SysStockDayServiceImpl implements ISysStockDayService
                     fundRanking.setName(s.getName());
                     fundRanking.setSymbol(s.getSymbol());
                     fundRanking.setTime("近一周");
-                    fundRanking.setFirstPercent("0");
+                    fundRanking.setPercent("0");
                     fundRankingList.add(fundRanking);
                 });
             }else{
@@ -159,7 +159,7 @@ public class SysStockDayServiceImpl implements ISysStockDayService
                     //获取一周前的股票数据对象
                     SysStockDay filterObject = filterSysStockDay(weekSysStockDayList,s.getSymbol());
                     fundRanking.setTime("近一周");
-                    fundRanking.setFirstPercent(computedPercent(filterObject.getCurrent(),s.getCurrent()));
+                    fundRanking.setPercent(computedPercent(filterObject.getCurrent(),s.getCurrent()));
                     fundRankingList.add(fundRanking);
                 });
             }
@@ -173,6 +173,22 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     public int batchInsertSysStockDay(List<SysStockDay> sysStockDayList) {
         return sysStockDayMapper.batchInsertSysStockDay(sysStockDayList);
     }
+
+    @Override
+    public List<Map<String, Object>> selectSysStockMap(Map<String, Object> map) {
+        return sysStockDayMapper.selectSysStockMap(map);
+    }
+
+    @Override
+    public void updateVolumeRatioEps(VolumeRatioEps map) {
+        sysStockDayMapper.updateVolumeRatioEps(map);
+    }
+
+    @Override
+    public void batchUpdateVolumeRatioEps(List<VolumeRatioEps> mapList) {
+        sysStockDayMapper.batchUpdateVolumeRatioEps(mapList);
+    }
+
 
     public SysStockDay filterSysStockDay(List<SysStockDay> sysStockDayList,String symbol){
         List<SysStockDay> filterList = sysStockDayList.stream().filter(s->s.getSymbol().equals(symbol)).collect(Collectors.toList());

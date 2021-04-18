@@ -10,7 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="name"    column="name"    />
         <result property="current"    column="current"    />
         <result property="chg"    column="chg"    />
-        <result property="firstPercent"    column="first_percent"    />
+        <result property="percent"    column="percent"    />
         <result property="currentYearPercent"    column="current_year_percent"    />
         <result property="volume"    column="volume"    />
         <result property="amount"    column="amount"    />
@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectSysStockDayVo">
-        select id, symbol, name, current, chg, first_percent, current_year_percent, volume, amount, turnover_rate, pe_ttm, market_capital, create_time,volume_ratio from sys_stock_day
+        select id, symbol, name, current, chg, percent, current_year_percent, volume, amount, turnover_rate, pe_ttm, market_capital, create_time,volume_ratio,dividend_yield from sys_stock_day
     </sql>
 
     <select id="selectSysStockDayList" parameterType="SysStockDay" resultMap="SysStockDayResult">
@@ -32,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="current != null  and current != ''"> and current = #{current}</if>
             <if test="chg != null  and chg != ''"> and chg = #{chg}</if>
-            <if test="firstPercent != null  and firstPercent != ''"> and first_percent = #{firstPercent}</if>
+            <if test="percent != null  and percent != ''"> and percent = #{percent}</if>
             <if test="currentYearPercent != null  and currentYearPercent != ''"> and current_year_percent = #{currentYearPercent}</if>
             <if test="volume != null  and volume != ''"> and volume = #{volume}</if>
             <if test="amount != null  and amount != ''"> and amount = #{amount}</if>
@@ -54,7 +54,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="name != null and name != ''">name,</if>
             <if test="current != null">current,</if>
             <if test="chg != null">chg,</if>
-            <if test="firstPercent != null">first_percent,</if>
+            <if test="percent != null">percent,</if>
             <if test="currentYearPercent != null">current_year_percent,</if>
             <if test="volume != null">volume,</if>
             <if test="amount != null">amount,</if>
@@ -69,7 +69,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="name != null and name != ''">#{name},</if>
             <if test="current != null">#{current},</if>
             <if test="chg != null">#{chg},</if>
-            <if test="firstPercent != null">#{firstPercent},</if>
+            <if test="percent != null">#{percent},</if>
             <if test="currentYearPercent != null">#{currentYearPercent},</if>
             <if test="volume != null">#{volume},</if>
             <if test="amount != null">#{amount},</if>
@@ -84,10 +84,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--批量插入-->
     <insert id="batchInsertSysStockDay" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
         insert into sys_stock_day
-        (symbol, name, current, chg, first_percent, current_year_percent, volume, amount, turnover_rate, pe_ttm, market_capital, create_time)
+        (symbol, name, current, chg, percent, current_year_percent, volume, amount, turnover_rate, pe_ttm, market_capital, create_time,pb,dividend_yield)
         values
         <foreach collection="list" separator="," item="item">
-        (#{item.symbol},#{item.name},#{item.current},#{item.chg},#{item.firstPercent},#{item.currentYearPercent},#{item.volume},#{item.amount},#{item.turnoverRate},#{item.peTtm},#{item.marketCapital},#{item.createTime})
+        (#{item.symbol},#{item.name},#{item.current},#{item.chg},#{item.percent},#{item.currentYearPercent},#{item.volume},#{item.amount},#{item.turnoverRate},#{item.peTtm},#{item.marketCapital},#{item.createTime},#{item.pb},#{item.dividendYield})
         </foreach>
     </insert>
 
@@ -98,7 +98,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="name != null and name != ''">name = #{name},</if>
             <if test="current != null">current = #{current},</if>
             <if test="chg != null">chg = #{chg},</if>
-            <if test="firstPercent != null">first_percent = #{firstPercent},</if>
+            <if test="percent != null">percent = #{percent},</if>
             <if test="currentYearPercent != null">current_year_percent = #{currentYearPercent},</if>
             <if test="volume != null">volume = #{volume},</if>
             <if test="amount != null">amount = #{amount},</if>
@@ -129,4 +129,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
         </where>
     </select>
+
+    <select id="selectSysStockMap" parameterType="java.util.Map" resultType="java.util.Map">
+        select id,symbol from sys_stock_day
+        <where>
+            <if test="startDateTime!=null and endDateTime!=null">
+                create_time between #{startDateTime} and #{endDateTime}
+            </if>
+        </where>
+    </select>
+    <!--更新净资产收益率和每股收益-->
+    <update id="updateVolumeRatioEps" parameterType="VolumeRatioEps">
+        update sys_stock_day
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="eps != null">eps = #{eps},</if>
+            <if test="volumeRatio != null">volume_ratio = #{volumeRatio},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="batchUpdateVolumeRatioEps"  parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update sys_stock_day set eps = #{item.eps},volume_ratio = #{item.volumeRatio} where id = #{item.id}
+        </foreach>
+    </update>
 </mapper>

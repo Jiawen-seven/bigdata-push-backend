@@ -42,6 +42,7 @@ public class RyTask
     /*获取雪球网股票数据*/
     public void getXueQiuStock(){
         xueQiuRequest.getStockList("CN","sh_sz");
+        xueQiuRequest.updateVolumeRatioEps();
     }
     /*
     * 定时更新基金榜

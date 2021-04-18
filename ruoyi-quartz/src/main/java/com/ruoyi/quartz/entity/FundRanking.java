@@ -10,11 +10,11 @@ public class FundRanking implements Serializable,Comparable<FundRanking> {
     private String name;
     private String time;
     /** 涨跌幅 */
-    private String firstPercent;
+    private String percent;
 
     @Override
     public int compareTo(FundRanking o) {
-        return (int) (Double.parseDouble(this.getFirstPercent())-Double.parseDouble(o.getFirstPercent()));
+        return (int) (Double.parseDouble(this.getPercent())-Double.parseDouble(o.getPercent()));
     }
 
 }

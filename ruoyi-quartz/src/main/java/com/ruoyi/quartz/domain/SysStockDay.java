@@ -36,7 +36,7 @@ public class SysStockDay extends BaseEntity
 
     /** 涨跌幅 */
     @Excel(name = "涨跌幅")
-    private String firstPercent;
+    private String percent;
 
     /** 年初至今涨跌 */
     @Excel(name = "年初至今涨跌")
@@ -66,10 +66,27 @@ public class SysStockDay extends BaseEntity
     @Excel(name = "每股净资产")
     private String volumeRatio;
 
-    /*全局唯一键*/
-    private String stockKey;
+    /*市净率*/
+    private String pb;
 
+    /*股息率*/
+    private String dividendYield;
 
+    public String getDividendYield() {
+        return dividendYield;
+    }
+
+    public void setDividendYield(String dividendYield) {
+        this.dividendYield = dividendYield;
+    }
+
+    public String getPb() {
+        return pb;
+    }
+
+    public void setPb(String pb) {
+        this.pb = pb;
+    }
 
     public String getVolumeRatio() {
         return volumeRatio;
@@ -124,16 +141,16 @@ public class SysStockDay extends BaseEntity
     {
         return chg;
     }
-    public void setFirstPercent(String firstPercent) 
-    {
-        this.firstPercent = firstPercent;
+
+    public String getPercent() {
+        return percent;
     }
 
-    public String getFirstPercent() 
-    {
-        return firstPercent;
+    public void setPercent(String percent) {
+        this.percent = percent;
     }
-    public void setCurrentYearPercent(String currentYearPercent) 
+
+    public void setCurrentYearPercent(String currentYearPercent)
     {
         this.currentYearPercent = currentYearPercent;
     }
@@ -196,7 +213,7 @@ public class SysStockDay extends BaseEntity
                 .append("name", name)
                 .append("current", current)
                 .append("chg", chg)
-                .append("firstPercent", firstPercent)
+                .append("percent", percent)
                 .append("currentYearPercent", currentYearPercent)
                 .append("volume", volume)
                 .append("amount", amount)
@@ -204,6 +221,8 @@ public class SysStockDay extends BaseEntity
                 .append("peTtm", peTtm)
                 .append("marketCapital", marketCapital)
                 .append("volumeRatio", volumeRatio)
+                .append("pb", pb)
+                .append("dividendYield", dividendYield)
                 .toString();
     }
 }

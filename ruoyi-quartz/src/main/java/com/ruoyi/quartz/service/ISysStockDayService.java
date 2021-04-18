@@ -1,6 +1,7 @@
 package com.ruoyi.quartz.service;
 
 import com.ruoyi.quartz.domain.SysStockDay;
+import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.entity.FundRanking;
 
 import java.util.List;
@@ -82,4 +83,23 @@ public interface ISysStockDayService
      * 批量插入
      * */
     public int batchInsertSysStockDay(List<SysStockDay> sysStockDayList);
+
+    /**
+     * @Description: 获取id和symbol
+     * @param: [map]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Date: 2021/4/18
+     */
+    public List<Map<String,Object>> selectSysStockMap(Map<String,Object> map);
+
+    /*
+     * 更新每股净资产收益率和每股收益
+     *
+     * */
+    public void updateVolumeRatioEps(VolumeRatioEps map);
+
+    /*
+     * 批量更新每股净资产收益率和每股收益
+     * */
+    void batchUpdateVolumeRatioEps(List<VolumeRatioEps> mapList);
 }
