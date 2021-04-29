@@ -118,4 +118,9 @@ public class SysStockDayController extends BaseController
     {
         return toAjax(sysStockDayService.deleteSysStockDayByIds(ids));
     }
+    @GetMapping("/test")
+    public AjaxResult test(){
+        sysStockDayService.selectFundRanking();
+        return AjaxResult.success();
+    }
 }

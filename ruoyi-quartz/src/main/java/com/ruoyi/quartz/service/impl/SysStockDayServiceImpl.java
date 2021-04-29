@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.entity.FundRanking;
@@ -126,7 +127,7 @@ public class SysStockDayServiceImpl implements ISysStockDayService
 
     @Override
     public void selectFundRanking() {
-        List<SysStockDay> sysStockDayList = redisCache.getCacheList(RequestConstants.XUE_QIU_STOCK_KEY);
+        List<SysStockDay> sysStockDayList = getSysStockListByRedisDate();
         if(sysStockDayList!=null && sysStockDayList.size()>0){
             Calendar calendar = Calendar.getInstance();
             Date dateBaseTime = sysStockDayList.get(0).getCreateTime();
@@ -134,12 +135,7 @@ public class SysStockDayServiceImpl implements ISysStockDayService
             //获取过去七天
             calendar.add(Calendar.DATE, - 7);
             Date aWeekAgoDate = calendar.getTime();
-            LocalDate aWeekAgoLocalDate = DateUtils.transferLocalDate(aWeekAgoDate);
-            LocalDateTime startLocalDateTime = LocalDateTime.of(aWeekAgoLocalDate, LocalTime.MIN);
-            LocalDateTime endLocalDateTime = LocalDateTime.of(aWeekAgoLocalDate, LocalTime.MAX);
-            Map<String,Object> map = new HashMap<>();
-            map.put("startDateTime",startLocalDateTime);
-            map.put("endDateTime",endLocalDateTime);
+            Map<String,Object> map = DateUtils.returnDateMap(aWeekAgoDate);
             List<SysStockDay> weekSysStockDayList = sysStockDayMapper.selectSysStockByDay(map);
             List<FundRanking> fundRankingList = new ArrayList<>();
             if(weekSysStockDayList==null || weekSysStockDayList.size()==0){
@@ -160,6 +156,8 @@ public class SysStockDayServiceImpl implements ISysStockDayService
                     SysStockDay filterObject = filterSysStockDay(weekSysStockDayList,s.getSymbol());
                     fundRanking.setTime("近一周");
                     fundRanking.setPercent(computedPercent(filterObject.getCurrent(),s.getCurrent()));
+                    System.out.println("查看FundRanking");
+                    System.out.println(fundRanking);
                     fundRankingList.add(fundRanking);
                 });
             }
@@ -191,14 +189,17 @@ public class SysStockDayServiceImpl implements ISysStockDayService
 
 
     public SysStockDay filterSysStockDay(List<SysStockDay> sysStockDayList,String symbol){
-        List<SysStockDay> filterList = sysStockDayList.stream().filter(s->s.getSymbol().equals(symbol)).collect(Collectors.toList());
-        if(filterList.size()>0){
-            return filterList.get(0);
-        }else{
-            return null;
+        for(SysStockDay sysStockDay:sysStockDayList){
+            if(symbol.equals(sysStockDay.getSymbol())){
+                return sysStockDay;
+            }
         }
+        return new SysStockDay();
     }
     public String computedPercent(String aWeekValue,String nowValue){
+        if(StringUtils.isEmpty(aWeekValue) || StringUtils.isEmpty(nowValue)){
+            return "0";
+        }
         double week  = Double.parseDouble(aWeekValue);
         double now = Double.parseDouble(nowValue);
         double result = (now-week)/week*100;

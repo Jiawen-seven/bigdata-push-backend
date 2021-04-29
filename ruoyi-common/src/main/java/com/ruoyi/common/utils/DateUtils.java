@@ -4,8 +4,13 @@ import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
@@ -172,5 +177,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
             return null;
         }
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+    public static Map<String, Object> returnDateMap(Date date){
+        LocalDate aWeekAgoLocalDate = DateUtils.transferLocalDate(date);
+        LocalDateTime startLocalDateTime = LocalDateTime.of(aWeekAgoLocalDate, LocalTime.MIN);
+        LocalDateTime endLocalDateTime = LocalDateTime.of(aWeekAgoLocalDate, LocalTime.MAX);
+        Map<String,Object> map = new HashMap<>();
+        map.put("startDateTime",startLocalDateTime);
+        map.put("endDateTime",endLocalDateTime);
+        return map;
     }
 }
