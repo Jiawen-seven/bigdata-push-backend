@@ -130,4 +130,6 @@ public interface SysUserMapper
     int updateRegisteredUser(Map<String,Object> sysUserRegistered);
     /*获取所有用户id*/
     List<Long> selectAllUser();
+    /*获取用户关注的所有股票代码*/
+    List<String> getUserStocks();
 }

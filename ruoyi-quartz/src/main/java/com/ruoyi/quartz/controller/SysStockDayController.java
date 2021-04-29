@@ -7,6 +7,7 @@ import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.entity.FundRanking;
+import com.ruoyi.quartz.service.ISysEmailService;
 import com.ruoyi.quartz.service.ISysStockDayService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class SysStockDayController extends BaseController
 
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private ISysEmailService sysEmailService;
 
     /**
      * 查询定时任务爬取股票数据列表
@@ -120,11 +124,20 @@ public class SysStockDayController extends BaseController
     }
     @GetMapping("/test")
     public AjaxResult test(){
-        sysStockDayService.updateStockRedBlack();
+        sysEmailService.sendMail(null);
         return AjaxResult.success();
     }
     @GetMapping("/getRedBlackList")
     public AjaxResult getRedBlackList(){
         return AjaxResult.success(sysStockDayService.getStockRedBlack());
+    }
+
+    @GetMapping("/getRealTime/{symbol}")
+    public AjaxResult getStockRealTimeStatus(@PathVariable String symbol){
+        return AjaxResult.success(sysStockDayService.getStockRealTimeStatus(symbol));
+    }
+    @GetMapping("/getHourDataList/{hour}")
+    public AjaxResult getHourDataList(@PathVariable String hour){
+        return AjaxResult.success(sysStockDayService.getHourDataList(hour));
     }
 }

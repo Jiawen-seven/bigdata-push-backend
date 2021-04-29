@@ -232,5 +232,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<delete id="deleteRegisteredUser" parameterType="Long">
 		delete from sys_user_registered where user_id = #{userId}
 	</delete>
+	<select id="getUserStocks" resultType="String">
+		SELECT stock_type from sys_user_registered group by stock_type
+	</select>
 	
 </mapper> 

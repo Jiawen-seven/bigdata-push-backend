@@ -196,4 +196,6 @@ public interface ISysUserService
     * 获取用户的推送信息
     * */
     List<SysUserPush> getPushInfo();
+    /*获取用户关注的所有股票代码*/
+    List<String> getUserStocks();
 }

@@ -56,4 +56,16 @@ public class RyTask
     public void updateStockRedBlack(){
         sysStockDayService.updateStockRedBlack();
     }
+    /*
+    * 定时更新股票数据
+    * */
+    public void getStockRealData(){
+        xueQiuRequest.getStockRealData();
+    }
+    /*
+    * 1小时更新热榜数据
+    * */
+    public void getHourDataList(){
+        xueQiuRequest.getHourDataList();
+    }
 }

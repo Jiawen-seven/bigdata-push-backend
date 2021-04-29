@@ -112,4 +112,14 @@ public interface ISysStockDayService
     * 获取股票红黑榜
     * */
     JSONObject getStockRedBlack();
+
+    /*
+    * 获取股票实时状态
+    * */
+    JSONObject getStockRealTimeStatus(String symbol);
+
+    /*
+    * 从redis获取1小时和24小时数据
+    * */
+    JSONObject getHourDataList(String hour);
 }

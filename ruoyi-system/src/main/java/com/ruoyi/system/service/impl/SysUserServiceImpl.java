@@ -611,4 +611,9 @@ public class SysUserServiceImpl implements ISysUserService
         }
         return sysUserPushList;
     }
+
+    @Override
+    public List<String> getUserStocks() {
+        return userMapper.getUserStocks();
+    }
 }

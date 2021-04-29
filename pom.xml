@@ -193,6 +193,13 @@
                 <artifactId>ruoyi-common</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
+            <!--邮箱-->
+            <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-mail</artifactId>
+                <version>2.3.10.RELEASE</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

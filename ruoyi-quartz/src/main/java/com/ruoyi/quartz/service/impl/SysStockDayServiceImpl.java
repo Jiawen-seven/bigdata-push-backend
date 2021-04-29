@@ -230,6 +230,23 @@ public class SysStockDayServiceImpl implements ISysStockDayService
         return JSONObject.parseObject(xueQiuRedBlackList);
     }
 
+    @Override
+    public JSONObject getStockRealTimeStatus(String symbol) {
+        String realStock = redisCache.getCacheObject(RequestConstants.XUE_QIU_REAL_TIME+symbol);
+        return JSONObject.parseObject(realStock);
+    }
+
+    @Override
+    public JSONObject getHourDataList(String hour) {
+        String hourData = "";
+        if("1".equals(hour)){
+            hourData = redisCache.getCacheObject(RequestConstants.XUE_QIU_ONE_HOUR);
+        }else if("24".equals(hour)){
+            hourData = redisCache.getCacheObject(RequestConstants.XUE_QIU_TWENTY_FOUR);
+        }
+        return JSONObject.parseObject(hourData);
+    }
+
 
     public SysStockDay filterSysStockDay(List<SysStockDay> sysStockDayList,String symbol){
         for(SysStockDay sysStockDay:sysStockDayList){

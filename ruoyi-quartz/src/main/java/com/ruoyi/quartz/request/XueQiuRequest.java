@@ -6,10 +6,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.quartz.domain.SysQuote;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.service.ISysStockDayService;
+import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +38,17 @@ public class XueQiuRequest {
     @Autowired
     private ISysStockDayService sysStockDayService;
 
+    @Autowired
+    private ISysUserService sysUserService;
+
     public String getApiJson(String url){
         return (HttpRequest.get(url)
                 .header(Header.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36")//头信息，多个头信息多次调用此方法即可
-                .timeout(20000)//超时，毫秒
+                .header("authority","stock.xueqiu.com")
+                .header("accept","application/json, text/plain, */*")
+                .header("origin","https://xueqiu.com")
+                .header("cookie","xq_a_token=cc6a2aedef8a96868eb7257aef4a2ba6e222d2c6; xqat=cc6a2aedef8a96868eb7257aef4a2ba6e222d2c6; xq_r_token=3e168659e8b7d1863aff7a493cfc3398f438abe3; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTYxOTkyMzQ2NiwiY3RtIjoxNjE4MTM1MTUwMDMzLCJjaWQiOiJkOWQwbjRBWnVwIn0.dBBkrHufqFD7BbgRJLIdZJ7Udu0F-rzME6Eizy5Dki9MGmNqWg6vALuJ8EH5PNXN_pVXJJBpNZx45Vnnn3M0SVYetv32dy4_ayf3pk2qSkCzuEDaSoFEl0AMs_3gShTtz6rx_5A19qQzp4ul2laOP5_xxP_GYQGf1GkNQ_A-gutTz6KZ0nF9zmBU2_Nsj82e5_42RWfn7u2C2FBCybif-RMKmght546wO0yqMwesBMBvlADJV8LkbQnHsSKI3kbFBXKsoXWvmZVpQEBxCdRSCiNDVGCSZJDbefo36CNbayLwwdyW6GBqtxocf5wzlvwkdpHH9A8U5F1OdGDt9u_A6Q; u=441618135173095; device_id=24700f9f1986800ab4fcc880530dd0ed; Hm_lvt_1db88642e346389874251b5a1eded6e3=1616988967,1617073971,1618135169,1618136501; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1618136501")
+                .timeout(3000)//超时，毫秒
                 .execute().body());
     }
 
@@ -164,6 +174,38 @@ public class XueQiuRequest {
             updateMap.setId(m.get("id").toString());
             sysStockDayService.updateVolumeRatioEps(updateMap);
         });
+    }
+    /*
+    * 获取某只股票的实时状态
+    * */
+    public void getStockRealData(){
+        List<String> symbols = sysUserService.getUserStocks();
+        symbols.forEach(s->{
+            if(StringUtils.isNotEmpty(s)){
+                redisCache.deleteObject(RequestConstants.XUE_QIU_REAL_TIME+s);
+                redisCache.setCacheObject(
+                        RequestConstants.XUE_QIU_REAL_TIME+s,SplicingURL(s).toJSONString());
+            }
+        });
+    }
+    public JSONObject SplicingURL(String symbol){
+        String URL = "https://stock.xueqiu.com/v5/stock/quote.json?symbol="+symbol+"&extend=detail";
+        JSONObject jsonObject = JSONObject.parseObject(getApiJson(URL));
+        JSONObject quote =  jsonObject.getJSONObject("data").getJSONObject("quote");
+        JSONObject others = jsonObject.getJSONObject("data").getJSONObject("others");
+        JSONObject data = new JSONObject();
+        data.put("quote",quote);
+        data.put("others",others);
+        return data;
+    }
+    /*
+    * 获取1小时热榜数据和24小时热榜数据
+    * */
+    public void getHourDataList(){
+        String oneHourURL = "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=8&_type=12&type=12";
+        String twentyFourURL = "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=8&_type=12&type=22";
+        redisCache.setCacheObject(RequestConstants.XUE_QIU_ONE_HOUR,getApiJson(oneHourURL));
+        redisCache.setCacheObject(RequestConstants.XUE_QIU_TWENTY_FOUR,getApiJson(twentyFourURL));
     }
 
 }
