@@ -72,6 +72,17 @@ public class SysStockDay extends BaseEntity
     /*股息率*/
     private String dividendYield;
 
+    /*每股收益*/
+    private String eps;
+
+    public String getEps() {
+        return eps;
+    }
+
+    public void setEps(String eps) {
+        this.eps = eps;
+    }
+
     public String getDividendYield() {
         return dividendYield;
     }
@@ -223,6 +234,7 @@ public class SysStockDay extends BaseEntity
                 .append("volumeRatio", volumeRatio)
                 .append("pb", pb)
                 .append("dividendYield", dividendYield)
+                .append("eps", eps)
                 .toString();
     }
 }

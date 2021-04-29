@@ -50,4 +50,10 @@ public class RyTask
     public void getFundRanking(){
         sysStockDayService.selectFundRanking();
     }
+    /*
+    * 定时更新红黑榜
+    * */
+    public void updateStockRedBlack(){
+        sysStockDayService.updateStockRedBlack();
+    }
 }

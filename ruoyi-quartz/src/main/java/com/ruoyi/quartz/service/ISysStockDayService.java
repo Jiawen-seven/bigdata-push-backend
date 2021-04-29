@@ -1,5 +1,6 @@
 package com.ruoyi.quartz.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.entity.FundRanking;
@@ -102,4 +103,13 @@ public interface ISysStockDayService
      * 批量更新每股净资产收益率和每股收益
      * */
     void batchUpdateVolumeRatioEps(List<VolumeRatioEps> mapList);
+
+    /*
+    * 股票红黑榜业务
+    * */
+    void updateStockRedBlack();
+    /*
+    * 获取股票红黑榜
+    * */
+    JSONObject getStockRedBlack();
 }

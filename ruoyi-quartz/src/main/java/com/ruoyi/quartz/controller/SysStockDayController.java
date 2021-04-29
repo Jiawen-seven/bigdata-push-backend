@@ -120,7 +120,11 @@ public class SysStockDayController extends BaseController
     }
     @GetMapping("/test")
     public AjaxResult test(){
-        sysStockDayService.selectFundRanking();
+        sysStockDayService.updateStockRedBlack();
         return AjaxResult.success();
+    }
+    @GetMapping("/getRedBlackList")
+    public AjaxResult getRedBlackList(){
+        return AjaxResult.success(sysStockDayService.getStockRedBlack());
     }
 }

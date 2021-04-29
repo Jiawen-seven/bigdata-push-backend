@@ -19,10 +19,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="marketCapital"    column="market_capital"    />
         <result property="createTime"    column="create_time"    />
         <result property="volumeRatio" column="volume_ratio"/>
+        <result property="eps" column="eps"/>
     </resultMap>
 
     <sql id="selectSysStockDayVo">
-        select id, symbol, name, current, chg, percent, current_year_percent, volume, amount, turnover_rate, pe_ttm, market_capital, create_time,volume_ratio,dividend_yield from sys_stock_day
+        select id, symbol, name, current, chg, percent, current_year_percent, volume, amount, turnover_rate, pe_ttm, market_capital, create_time,volume_ratio,dividend_yield,eps from sys_stock_day
     </sql>
 
     <select id="selectSysStockDayList" parameterType="SysStockDay" resultMap="SysStockDayResult">

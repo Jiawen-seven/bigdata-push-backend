@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
@@ -14,9 +15,11 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.entity.FundRanking;
+import com.ruoyi.quartz.entity.RedBlackList;
 import com.ruoyi.quartz.mapper.SysStockDayMapper;
 import com.ruoyi.quartz.service.ISysStockDayService;
 import com.ruoyi.quartz.util.PageUtils;
+import com.ruoyi.quartz.util.RedBlackListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -185,6 +188,46 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     @Override
     public void batchUpdateVolumeRatioEps(List<VolumeRatioEps> mapList) {
         sysStockDayMapper.batchUpdateVolumeRatioEps(mapList);
+    }
+
+    @Override
+    public void updateStockRedBlack() {
+        List<SysStockDay> sysStockDayList = getSysStockListByRedisDate();
+        List<RedBlackList> redBlackLists = new ArrayList<>();
+        sysStockDayList.forEach(sysStockDay -> {
+            int epsScore = RedBlackListUtils.computedEps(sysStockDay.getEps());
+            int volumeRatioScore = RedBlackListUtils.computedVolumeRatio(sysStockDay.getVolumeRatio());
+            int peTtmScore = RedBlackListUtils.computedPeTtm(sysStockDay.getPeTtm());
+            int pbScore = RedBlackListUtils.computedPb(sysStockDay.getPb());
+            int score = (epsScore+volumeRatioScore+peTtmScore+pbScore)/4;
+            RedBlackList redBlackList = new RedBlackList();
+            redBlackList.setName(sysStockDay.getName());
+            redBlackList.setScore(score);
+            redBlackList.setSymbol(sysStockDay.getSymbol());
+            redBlackLists.add(redBlackList);
+        });
+        Collections.sort(redBlackLists);
+        List<RedBlackList> topThree = redBlackLists.subList(0,3);
+        List<RedBlackList> backThree = redBlackLists.subList(redBlackLists.size()-3,redBlackLists.size());
+        topThree.forEach(t->{
+            t.setReason("业绩很稳定");
+        });
+        String[] arrays = {"业绩亏损第三","业绩亏损第二","业绩亏损第一"};
+        for (int i =0;i<backThree.size();i++) {
+            backThree.get(0).setReason(arrays[i]);
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("topThree",topThree);
+        map.put("backThree",backThree);
+        JSONObject jsonObject = new JSONObject(map);
+        redisCache.deleteObject(RequestConstants.XUE_QIU_RED_BLACK);
+        redisCache.setCacheObject(RequestConstants.XUE_QIU_RED_BLACK,jsonObject.toJSONString());
+    }
+
+    @Override
+    public JSONObject getStockRedBlack() {
+        String xueQiuRedBlackList = redisCache.getCacheObject(RequestConstants.XUE_QIU_RED_BLACK);
+        return JSONObject.parseObject(xueQiuRedBlackList);
     }
 
 
