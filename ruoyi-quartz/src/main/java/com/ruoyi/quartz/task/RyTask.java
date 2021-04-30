@@ -68,4 +68,10 @@ public class RyTask
     public void getHourDataList(){
         xueQiuRequest.getHourDataList();
     }
+    /*
+    * 定时推送邮件
+    * */
+    public void sendStockInfoToMail(){
+        sysStockDayService.sendStockInfoToMail();
+    }
 }
