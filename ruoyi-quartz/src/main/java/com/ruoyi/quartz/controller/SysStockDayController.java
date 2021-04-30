@@ -35,8 +35,6 @@ public class SysStockDayController extends BaseController
     @Autowired
     private RedisCache redisCache;
 
-    @Autowired
-    private ISysEmailService sysEmailService;
 
     /**
      * 查询定时任务爬取股票数据列表
@@ -124,7 +122,7 @@ public class SysStockDayController extends BaseController
     }
     @GetMapping("/test")
     public AjaxResult test(){
-        sysEmailService.sendMail(null);
+        sysStockDayService.sendStockInfoToMail();
         return AjaxResult.success();
     }
     @GetMapping("/getRedBlackList")

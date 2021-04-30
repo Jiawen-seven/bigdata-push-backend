@@ -14,7 +14,8 @@ import java.util.List;
  */
 @Data
 public class MailEntity implements Serializable {
-    private List<String> tos;
-    private List<String> subjects;
-    private List<String> contents;
+    //股票代码
+    private String symbol;
+    //股票信息
+    private String content;
 }

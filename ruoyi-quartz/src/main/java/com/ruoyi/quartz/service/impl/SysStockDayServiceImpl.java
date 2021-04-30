@@ -15,11 +15,17 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.entity.FundRanking;
+import com.ruoyi.quartz.entity.MailEntity;
 import com.ruoyi.quartz.entity.RedBlackList;
+import com.ruoyi.quartz.entity.StockInfo;
 import com.ruoyi.quartz.mapper.SysStockDayMapper;
+import com.ruoyi.quartz.service.ISysEmailService;
 import com.ruoyi.quartz.service.ISysStockDayService;
+import com.ruoyi.quartz.util.EmailTableUtils;
 import com.ruoyi.quartz.util.PageUtils;
 import com.ruoyi.quartz.util.RedBlackListUtils;
+import com.ruoyi.system.domain.SysUserRegistered;
+import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +43,12 @@ public class SysStockDayServiceImpl implements ISysStockDayService
 
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private ISysUserService sysUserService;
+
+    @Autowired
+    private ISysEmailService sysEmailService;
 
     /**
      * 查询定时任务爬取股票数据
@@ -165,6 +177,7 @@ public class SysStockDayServiceImpl implements ISysStockDayService
                 });
             }
             Collections.sort(fundRankingList);
+            Collections.reverse(fundRankingList);
             redisCache.deleteObject(RequestConstants.XUE_QIU_FUND_RANK_KEY);
             redisCache.setCacheList(RequestConstants.XUE_QIU_FUND_RANK_KEY,fundRankingList.subList(0,10));
         }
@@ -245,6 +258,30 @@ public class SysStockDayServiceImpl implements ISysStockDayService
             hourData = redisCache.getCacheObject(RequestConstants.XUE_QIU_TWENTY_FOUR);
         }
         return JSONObject.parseObject(hourData);
+    }
+
+    @Override
+    public void sendStockInfoToMail() {
+        List<String> symbols = sysUserService.getUserStocks();
+        List<MailEntity> mailEntityList = new ArrayList<>();
+        symbols.forEach(s->{
+            if(StringUtils.isNotEmpty(s)){
+                JSONObject json  = JSONObject.parseObject(redisCache.getCacheObject(RequestConstants.XUE_QIU_REAL_TIME+s));
+                if(json!=null){
+                    List<String> stockInfos = new ArrayList<>();
+                    String name  = json.getJSONObject("quote").getString("name");
+                    String symbol  = json.getJSONObject("quote").getString("symbol");
+                    for(StockInfo stockInfo:StockInfo.values()){
+                        String value = json.getJSONObject("quote").getString(stockInfo.getCode());
+                        String code = stockInfo.getCode();
+                        stockInfos.add(EmailTableUtils.formatValue(value,code));
+                    }
+                    mailEntityList.add(EmailTableUtils.getTableBody(stockInfos,name,symbol));
+                }
+            }
+        });
+        List<SysUserRegistered> userRegisteredList = sysUserService.selectAllRegisteredUser();
+        sysEmailService.sendMail(mailEntityList,userRegisteredList);
     }
 
 

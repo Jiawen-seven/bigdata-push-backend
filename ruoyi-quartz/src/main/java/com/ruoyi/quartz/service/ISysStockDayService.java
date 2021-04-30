@@ -122,4 +122,8 @@ public interface ISysStockDayService
     * 从redis获取1小时和24小时数据
     * */
     JSONObject getHourDataList(String hour);
+    /*
+    * 邮箱推送股票信息
+    * */
+    void sendStockInfoToMail();
 }
