@@ -22,4 +22,8 @@ public class RequestConstants {
     * 24小时热榜数据
     * */
     public final static String XUE_QIU_TWENTY_FOUR="xue_qiu_twenty_four";
+    /*
+    * 日K线数据
+    * */
+    public final static String XUE_QIU_DAY_K="xue_qiu_day_k";
 }

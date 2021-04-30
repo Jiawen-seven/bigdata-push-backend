@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -227,7 +228,7 @@ public class SysStockDayServiceImpl implements ISysStockDayService
         });
         String[] arrays = {"业绩亏损第三","业绩亏损第二","业绩亏损第一"};
         for (int i =0;i<backThree.size();i++) {
-            backThree.get(0).setReason(arrays[i]);
+            backThree.get(i).setReason(arrays[i]);
         }
         Map<String,Object> map = new HashMap<>();
         map.put("topThree",topThree);
@@ -282,6 +283,11 @@ public class SysStockDayServiceImpl implements ISysStockDayService
         });
         List<SysUserRegistered> userRegisteredList = sysUserService.selectAllRegisteredUser();
         sysEmailService.sendMail(mailEntityList,userRegisteredList);
+    }
+
+    @Override
+    public List<JSONArray> getDayK(String symbol) {
+        return redisCache.getCacheList(RequestConstants.XUE_QIU_DAY_K+symbol);
     }
 
 

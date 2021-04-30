@@ -1,5 +1,6 @@
 package com.ruoyi.quartz.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
@@ -126,4 +127,8 @@ public interface ISysStockDayService
     * 邮箱推送股票信息
     * */
     void sendStockInfoToMail();
+    /*
+    * 获取日K线数据
+    * */
+    List<JSONArray> getDayK(String symbol);
 }

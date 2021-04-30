@@ -74,4 +74,10 @@ public class RyTask
     public void sendStockInfoToMail(){
         sysStockDayService.sendStockInfoToMail();
     }
+    /*
+    * 定时更新日K线
+    * */
+    public void getDayK(){
+        xueQiuRequest.getDayK();
+    }
 }

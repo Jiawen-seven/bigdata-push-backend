@@ -138,4 +138,8 @@ public class SysStockDayController extends BaseController
     public AjaxResult getHourDataList(@PathVariable String hour){
         return AjaxResult.success(sysStockDayService.getHourDataList(hour));
     }
+    @GetMapping("/getDayK/{symbol}")
+    public AjaxResult getDayK(@PathVariable String symbol){
+        return AjaxResult.success(sysStockDayService.getDayK(symbol));
+    }
 }

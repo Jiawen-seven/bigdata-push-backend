@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.quartz.domain.SysQuote;
 import com.ruoyi.quartz.domain.SysStockDay;
@@ -207,5 +208,45 @@ public class XueQiuRequest {
         redisCache.setCacheObject(RequestConstants.XUE_QIU_ONE_HOUR,getApiJson(oneHourURL));
         redisCache.setCacheObject(RequestConstants.XUE_QIU_TWENTY_FOUR,getApiJson(twentyFourURL));
     }
+    /*
+    * 获取日K线图
+    * */
+    public void getDayK(){
+        List<String> symbols = sysUserService.getUserStocks();
+        List<JSONArray> arrays = new ArrayList<>();
+        symbols.forEach(s->{
+            if(StringUtils.isNotEmpty(s)){
+                JSONObject jsonObject = getDayKUrl(s);
+                JSONArray array = jsonObject.getJSONArray("item");
+                for(int i=0;i<array.size();i++){
+                    JSONArray arr = array.getJSONArray(i);
+                    long timestamp = arr.getLong(0);
+                    JSONArray list = new JSONArray();
+                    String date = DateUtils.dateTime(new Date(timestamp));
+                    String open = arr.getString(2);
+                    String close = arr.getString(5);
+                    String low = arr.getString(4);
+                    String high = arr.getString(3);
+                    String volume = arr.getString(1);
+                    list.add(date);
+                    list.add(open);
+                    list.add(close);
+                    list.add(low);
+                    list.add(high);
+                    list.add(volume);
+                    arrays.add(list);
+                }
+                redisCache.setCacheList(RequestConstants.XUE_QIU_DAY_K+s,arrays);
+            }
+        });
+    }
 
+    /*
+    * 获取日K线图爬取链接
+    * */
+    public JSONObject getDayKUrl(String symbol){
+        long timestamp = System.currentTimeMillis();
+        String URL="https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol="+symbol+"&begin="+timestamp+"&period=day&type=before&count=-284&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance";
+        return JSONObject.parseObject(getApiJson(URL)).getJSONObject("data");
+    }
 }
