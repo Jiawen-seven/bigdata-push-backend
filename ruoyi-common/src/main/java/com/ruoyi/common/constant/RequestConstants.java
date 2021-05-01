@@ -4,6 +4,7 @@ public class RequestConstants {
 
     public final static String XUE_QIU_KEY ="xue_qiu_quote_key";
 
+    //存放爬虫日期
     public final static String XUE_QIU_STOCK_KEY="xue_qiu_stock_key";
 
     public final static String XUE_QIU_FUND_RANK_KEY="xue_qiu_fund_rank_key";
@@ -26,4 +27,8 @@ public class RequestConstants {
     * 日K线数据
     * */
     public final static String XUE_QIU_DAY_K="xue_qiu_day_k";
+    /*
+    * 存储股评的键
+    * */
+    public final static String XUE_QIU_COMMENT="xue_qiu_comment";
 }

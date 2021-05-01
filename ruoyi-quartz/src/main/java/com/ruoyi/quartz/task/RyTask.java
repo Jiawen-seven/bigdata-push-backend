@@ -80,4 +80,16 @@ public class RyTask
     public void getDayK(){
         xueQiuRequest.getDayK();
     }
+    /*
+    * 定时爬取股评
+    * */
+    public void spiderStockComment(){
+        xueQiuRequest.spiderStockComment();
+    }
+    /*
+    * 定时计算股评
+    * */
+    public void computedComment(){
+        sysStockDayService.computedExcellentStockComment();
+    }
 }

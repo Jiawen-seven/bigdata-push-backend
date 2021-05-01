@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.entity.FundRanking;
+import com.ruoyi.quartz.entity.StockComment;
 
 import java.util.List;
 import java.util.Map;
@@ -131,4 +132,21 @@ public interface ISysStockDayService
     * 获取日K线数据
     * */
     List<JSONArray> getDayK(String symbol);
+    /**
+     * @description 计算优质股评
+     * @param
+     * @see
+     * @author jijj
+     * @createTime 2021/5/1 18:09
+     */
+    void computedExcellentStockComment();
+
+    /**
+     * @description 获取redis中的优质股评
+     * @param
+     * @see List<StockComment>
+     * @author jijj
+     * @createTime 2021/5/1 23:48
+     */
+    List<StockComment> getCommentList(String symbol);
 }

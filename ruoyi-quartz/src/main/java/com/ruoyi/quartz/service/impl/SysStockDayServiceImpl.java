@@ -13,12 +13,11 @@ import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.quartz.dao.XueQiuDao;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
-import com.ruoyi.quartz.entity.FundRanking;
-import com.ruoyi.quartz.entity.MailEntity;
-import com.ruoyi.quartz.entity.RedBlackList;
-import com.ruoyi.quartz.entity.StockInfo;
+import com.ruoyi.quartz.domain.XueQiu;
+import com.ruoyi.quartz.entity.*;
 import com.ruoyi.quartz.mapper.SysStockDayMapper;
 import com.ruoyi.quartz.service.ISysEmailService;
 import com.ruoyi.quartz.service.ISysStockDayService;
@@ -28,6 +27,7 @@ import com.ruoyi.quartz.util.RedBlackListUtils;
 import com.ruoyi.system.domain.SysUserRegistered;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,6 +50,9 @@ public class SysStockDayServiceImpl implements ISysStockDayService
 
     @Autowired
     private ISysEmailService sysEmailService;
+
+    @Autowired
+    private XueQiuDao xueQiuDao;
 
     /**
      * 查询定时任务爬取股票数据
@@ -288,6 +291,98 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     @Override
     public List<JSONArray> getDayK(String symbol) {
         return redisCache.getCacheList(RequestConstants.XUE_QIU_DAY_K+symbol);
+    }
+
+    @Override
+    public void computedExcellentStockComment() {
+        List<String> symbols = sysUserService.getUserStocks();
+        symbols = symbols.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+        String date = redisCache.getCacheObject(RequestConstants.XUE_QIU_STOCK_KEY);
+        for(String symbol:symbols){
+            List<XueQiu> xueQiuList = xueQiuDao.getXueQiuList(date,symbol);
+            if(xueQiuList==null){
+                continue;
+            }
+            List<StockComment> stockCommentList = computedComment(xueQiuList);
+            if(stockCommentList==null || stockCommentList.size()==0){
+                continue;
+            }
+            List<StockComment> commentList = stockCommentList.stream().filter(s->s.getFlag()==2).collect(Collectors.toList());
+            if(commentList!=null && commentList.size()>0){
+                redisCache.deleteObject(RequestConstants.XUE_QIU_COMMENT+symbol);
+                redisCache.setCacheList(RequestConstants.XUE_QIU_COMMENT+symbol,commentList);
+            }
+        }
+    }
+
+    @Override
+    public List<StockComment> getCommentList(String symbol) {
+        return redisCache.getCacheList(RequestConstants.XUE_QIU_COMMENT+symbol);
+    }
+
+    public List<StockComment> computedComment(List<XueQiu> xueQiuList){
+        List<StockComment> stockCommentList = new ArrayList<>();
+        for(XueQiu xueQiu:xueQiuList){
+            StockComment stockComment = new StockComment();
+            stockComment.setAvatar(xueQiu.getProfile_image_url());
+            stockComment.setScreenName(xueQiu.getScreen_name());
+            stockComment.setText(xueQiu.getText());
+            stockComment.setSymbol(xueQiu.getSymbol());
+            //收藏
+            long fav_count =0L;
+            if(xueQiu.getFav_count()!=null){
+                fav_count = xueQiu.getFav_count();
+            }
+            //点赞数
+            long like_count = 0L;
+            if(xueQiu.getLike_count()!=null){
+                like_count = xueQiu.getLike_count();
+            }
+            //评论数
+            long reply_count = 0L;
+            if(xueQiu.getReply_count()!=null){
+                reply_count = xueQiu.getReply_count();
+            }
+            //转发数
+            long retweet_count=0L;
+            if(xueQiu.getRetweet_count()!=null){
+                retweet_count =xueQiu.getRetweet_count();
+            }
+            //查看数
+            long view_count=0L;
+            if(xueQiu.getView_count()!=null){
+                view_count = xueQiu.getView_count();
+            }
+            //粉丝数
+            long followers_count = 0L;
+            if(xueQiu.getFollowers_count()!=null){
+                followers_count = xueQiu.getFollowers_count();
+            }
+            //关注数
+            long friends_count=0L;
+            if(xueQiu.getFriends_count()!=null){
+                friends_count = xueQiu.getFriends_count();
+            }
+            //帖子数
+            long status_count=0L;
+            if(xueQiu.getStatus_count()!=null){
+                status_count=xueQiu.getStatus_count();
+            }
+            boolean is_verify = xueQiu.getVerified_info();
+            if(fav_count>=0 &&like_count>=0 &&reply_count>=0 &&retweet_count>=0
+                    &&view_count>=0 &&view_count<=5000&&followers_count>0&&followers_count<500&&friends_count<10*followers_count
+                    &&status_count>0 && status_count<1000 && !is_verify){
+                stockComment.setFlag(1);
+                stockComment.setDesc("正常股评");
+            }else if(fav_count>=0 &&like_count>=0 &&reply_count>=0 &&retweet_count>=0
+                    &&view_count>5000&&followers_count>500&&friends_count<followers_count
+                    &&status_count>1000 && is_verify){
+                stockComment.setFlag(2);
+                stockComment.setDesc("资深股评");
+            }
+            stockCommentList.add(stockComment);
+        }
+        return stockCommentList;
     }
 
 

@@ -8,9 +8,11 @@ import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.quartz.dao.XueQiuDao;
 import com.ruoyi.quartz.domain.SysQuote;
 import com.ruoyi.quartz.domain.SysStockDay;
 import com.ruoyi.quartz.domain.VolumeRatioEps;
+import com.ruoyi.quartz.domain.XueQiu;
 import com.ruoyi.quartz.service.ISysStockDayService;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysUserService;
@@ -24,6 +26,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 public class XueQiuRequest {
@@ -41,6 +45,9 @@ public class XueQiuRequest {
 
     @Autowired
     private ISysUserService sysUserService;
+
+    @Autowired
+    private XueQiuDao xueQiuDao;
 
     public String getApiJson(String url){
         return (HttpRequest.get(url)
@@ -223,11 +230,11 @@ public class XueQiuRequest {
                     long timestamp = arr.getLong(0);
                     JSONArray list = new JSONArray();
                     String date = DateUtils.dateTime(new Date(timestamp));
-                    String open = arr.getString(2);
-                    String close = arr.getString(5);
-                    String low = arr.getString(4);
-                    String high = arr.getString(3);
-                    String volume = arr.getString(1);
+                    Double open = arr.getDouble(2);
+                    Double close = arr.getDouble(5);
+                    Double low = arr.getDouble(4);
+                    Double high = arr.getDouble(3);
+                    Double volume = arr.getDouble(1);
                     list.add(date);
                     list.add(open);
                     list.add(close);
@@ -236,6 +243,7 @@ public class XueQiuRequest {
                     list.add(volume);
                     arrays.add(list);
                 }
+                redisCache.deleteObject(RequestConstants.XUE_QIU_DAY_K+s);
                 redisCache.setCacheList(RequestConstants.XUE_QIU_DAY_K+s,arrays);
             }
         });
@@ -248,5 +256,88 @@ public class XueQiuRequest {
         long timestamp = System.currentTimeMillis();
         String URL="https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol="+symbol+"&begin="+timestamp+"&period=day&type=before&count=-284&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance";
         return JSONObject.parseObject(getApiJson(URL)).getJSONObject("data");
+    }
+    /**
+     * @description 爬取第一页股评
+     * @param symbol
+     * @see JSONObject
+     * @author jijj
+     * @createTime 2021/5/1 10:54
+     */
+    public JSONArray getFirstStockComment(String symbol){
+        String URL = "https://xueqiu.com/query/v1/symbol/search/status?u=351619836834806&uuid=1388322554107805696&count=10&comment=0&symbol="+symbol+
+                "&hl=0&source=all&sort=&page=1&q=&type=11&session_token=null&access_token=520e7bca78673752ed71e19b8820b5eb854123af";
+        return JSONObject.parseObject(getApiJson(URL)).getJSONArray("list");
+    }
+    /**
+     * @description 爬取除了第一页外的股评
+     * @param symbol, page, lastId]
+     * @see JSONObject
+     * @author jijj
+     * @createTime 2021/5/1 10:54
+     */
+    public JSONArray getStockComment(String symbol,int page,String lastId){
+        String URL="https://xueqiu.com/query/v1/symbol/search/status?u=351619836834806&uuid=1388322554107805696&count=10&comment=0&symbol="+symbol+
+                "&hl=0&source=all&sort=&page="+page+"&q=&type=11&session_token=null&access_token=520e7bca78673752ed71e19b8820b5eb854123af&last_id="+lastId;
+        return JSONObject.parseObject(getApiJson(URL)).getJSONArray("list");
+    }
+    /**
+     * @description 爬取总股评
+     * @param
+     * @see
+     * @author jijj
+     * @createTime 2021/5/1 10:55
+     */
+    public void spiderStockComment(){
+        List<String> symbols = sysUserService.getUserStocks();
+        symbols  =symbols.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+        String date  = redisCache.getCacheObject(RequestConstants.XUE_QIU_STOCK_KEY);
+        long timeFlag = DateUtils.dateTime(DateUtils.YYYY_MM_DD,date).getTime();
+        for(String symbol:symbols){
+            long spiderTime = Long.MAX_VALUE;
+            AtomicInteger a = new AtomicInteger(1);
+            String lastId = "";
+            List<XueQiu> xueQiuList = new ArrayList<>();
+            while (spiderTime>timeFlag){
+                JSONArray jsonArray = null;
+                if(a.get()==1){
+                    jsonArray = getFirstStockComment(symbol);
+                }else{
+                    jsonArray = getStockComment(symbol,a.get(),lastId);
+                }
+                for(int i =0;i<jsonArray.size();i++){
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    spiderTime = jsonObject.getLong("created_at");
+                    //只获取当天的股评
+                    if(spiderTime<timeFlag){
+                        break;
+                    }
+                    lastId = jsonObject.getString("id");
+                    XueQiu xueQiu = parseStockData(jsonObject);
+                    xueQiu.setSymbol(symbol);
+                    xueQiuList.add(xueQiu);
+                }
+                a.incrementAndGet();
+            }
+            xueQiuDao.insertList(xueQiuList);
+        }
+    }
+
+    public XueQiu parseStockData(JSONObject object){
+        XueQiu xueQiu = new XueQiu();
+        xueQiu.setFav_count(object.getLong("fav_count"));
+        xueQiu.setLike_count(object.getLong("like_count"));
+        xueQiu.setReply_count(object.getLong("reply_count"));
+        xueQiu.setRetweet_count(object.getLong("retweet_count"));
+        xueQiu.setView_count(object.getLong("view_count"));
+        xueQiu.setFollowers_count(object.getJSONObject("user").getLong("followers_count"));
+        xueQiu.setFriends_count(object.getJSONObject("user").getLong("friends_count"));
+        xueQiu.setStatus_count(object.getJSONObject("user").getLong("status_count"));
+        xueQiu.setVerified_info(object.getJSONObject("user").getJSONArray("verified_infos") != null);
+        xueQiu.setScreen_name(object.getJSONObject("user").getString("screen_name"));
+        xueQiu.setProfile_image_url(object.getJSONObject("user").getString("photo_domain")+object.getJSONObject("user").getString("profile_image_url").split(",")[0]);
+        xueQiu.setText(object.getString("text"));
+        xueQiu.setSpiderDate(DateUtils.getDate());
+        return xueQiu;
     }
 }
