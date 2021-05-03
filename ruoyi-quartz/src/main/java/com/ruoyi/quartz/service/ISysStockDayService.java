@@ -157,4 +157,6 @@ public interface ISysStockDayService
      * @createTime 2021/5/2 22:44
      */
     JSONObject getSystemStockData(String symbol);
+    //获取推荐股票列表
+    List<SysStockDay> selectRecommendStock(String symbol);
 }

@@ -9,4 +9,5 @@ public class VolumeRatioEps implements Serializable {
     private String id;
     private String eps;
     private String volumeRatio;
+    private Integer attentionCount;
 }

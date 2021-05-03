@@ -99,4 +99,11 @@ public class RyTask
     public void computedComment(){
         sysStockDayService.computedExcellentStockComment();
     }
+    /*
+    * 更新SysStock表中的type,股票属于哪个行业
+    * */
+    public void updateSysStockType(){
+        xueQiuRequest.updateSysStockData();
+        xueQiuRequest.updateSysStockType();
+    }
 }

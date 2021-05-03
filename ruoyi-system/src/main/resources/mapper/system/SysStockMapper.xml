@@ -41,8 +41,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update sys_stock
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null and name != ''">name = #{name},</if>
+            <if test="type != null and type != ''">type_name = #{type},</if>
+            <if test="encode != null and encode != ''">encode = #{encode},</if>
         </trim>
         where value = #{value}
+    </update>
+    <update id="updateSysStockBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update sys_stock set type_name = #{item.type} , encode=#{item.encode} where value = #{item.value}
+        </foreach>
     </update>
 
     <delete id="deleteSysStockById" parameterType="String">
@@ -55,4 +62,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{value}
         </foreach>
     </delete>
+    <delete id="deleteAll">
+        DELETE FROM sys_stock
+    </delete>
+    <delete id="deleteIsNull">
+        DELETE FROM sys_stock where type_name is NULL
+    </delete>
+    <insert id="insertAll" parameterType="java.util.List">
+        insert into sys_stock(value, name)
+        values
+        <foreach collection="list" separator="," item="item">
+            (#{item.value},#{item.name})
+        </foreach>
+    </insert>
 </mapper>

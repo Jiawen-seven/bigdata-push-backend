@@ -102,4 +102,6 @@ public interface SysStockDayMapper
     * 批量更新每股净资产收益率和每股收益
     * */
     void batchUpdateVolumeRatioEps(List<VolumeRatioEps> mapList);
+    //获取推荐股票列表
+    List<SysStockDay> selectRecommendStock(Map<String,Object> map);
 }

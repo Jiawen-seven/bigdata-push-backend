@@ -21,8 +21,28 @@ public class SysStock extends BaseEntity
     /** 股票名称 */
     @Excel(name = "股票名称")
     private String name;
+    /*股票属于哪种行业*/
+    private String type;
 
-    public void setValue(String value) 
+    private String encode;
+
+    public String getEncode() {
+        return encode;
+    }
+
+    public void setEncode(String encode) {
+        this.encode = encode;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setValue(String value)
     {
         this.value = value;
     }
@@ -43,9 +63,11 @@ public class SysStock extends BaseEntity
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("value", getValue())
-            .append("name", getName())
-            .toString();
+        return new ToStringBuilder(this)
+                .append("value", value)
+                .append("name", name)
+                .append("type", type)
+                .append("encode", encode)
+                .toString();
     }
 }

@@ -132,7 +132,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectSysStockMap" parameterType="java.util.Map" resultType="java.util.Map">
-        select id,symbol from sys_stock_day
+        select id,symbol,name from sys_stock_day
         <where>
             <if test="startDateTime!=null and endDateTime!=null">
                 create_time between #{startDateTime} and #{endDateTime}
@@ -145,6 +145,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="eps != null">eps = #{eps},</if>
             <if test="volumeRatio != null">volume_ratio = #{volumeRatio},</if>
+            <if test="attentionCount != null">attention_count = #{attentionCount},</if>
         </trim>
         where id = #{id}
     </update>
@@ -153,4 +154,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             update sys_stock_day set eps = #{item.eps},volume_ratio = #{item.volumeRatio} where id = #{item.id}
         </foreach>
     </update>
+    <select id="selectRecommendStock" parameterType="java.util.Map" resultType="SysStockDay">
+        <include refid="selectSysStockDayVo"/>
+        where symbol in (SELECT value from sys_stock WHERE encode =
+        (SELECT encode from sys_stock where value = #{value})) and  create_time BETWEEN #{startDate} and #{endDate} order by attention_count desc limit 10
+    </select>
 </mapper>

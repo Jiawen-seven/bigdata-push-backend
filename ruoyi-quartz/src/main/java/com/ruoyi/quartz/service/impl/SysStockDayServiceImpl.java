@@ -324,10 +324,8 @@ public class SysStockDayServiceImpl implements ISysStockDayService
                 continue;
             }
             List<StockComment> commentList = stockCommentList.stream().filter(s->s.getFlag()==2).collect(Collectors.toList());
-            if(commentList!=null && commentList.size()>0){
-                redisCache.deleteObject(RequestConstants.XUE_QIU_COMMENT+symbol);
-                redisCache.setCacheList(RequestConstants.XUE_QIU_COMMENT+symbol,commentList);
-            }
+            redisCache.deleteObject(RequestConstants.XUE_QIU_COMMENT+symbol);
+            redisCache.setCacheList(RequestConstants.XUE_QIU_COMMENT+symbol,commentList);
         }
     }
 
@@ -340,6 +338,19 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     public JSONObject getSystemStockData(String symbol) {
         Map<String,String> map = redisCache.getCacheMap(RequestConstants.XUE_QIU_LAST_DAY);
         return JSONObject.parseObject(map.get(symbol));
+    }
+
+    @Override
+    public List<SysStockDay> selectRecommendStock(String symbol) {
+        String dateTime = redisCache.getCacheObject(RequestConstants.XUE_QIU_STOCK_KEY);
+        LocalDate localDate = LocalDate.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime startLocalDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
+        LocalDateTime endLocalDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
+        Map<String,Object> map = new HashMap<>();
+        map.put("startDate",startLocalDateTime);
+        map.put("endDate",endLocalDateTime);
+        map.put("value",symbol);
+        return sysStockDayMapper.selectRecommendStock(map);
     }
 
     public List<StockComment> computedComment(List<XueQiu> xueQiuList){

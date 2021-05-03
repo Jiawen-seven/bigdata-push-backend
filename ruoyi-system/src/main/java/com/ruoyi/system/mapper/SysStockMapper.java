@@ -58,4 +58,30 @@ public interface SysStockMapper
      * @return 结果
      */
     public int deleteSysStockByIds(String[] values);
+    /**
+     * @description 批量更新sys_stock表
+     * @param
+     * @see
+     * @author jijj
+     * @createTime 2021/5/3 12:40
+     */
+    public void updateSysStockBatch(List<SysStock> sysStockList);
+    /**
+     * @description 删除所有sys_stock表
+     * @param
+     * @see
+     * @author jijj
+     * @createTime 2021/5/3 17:52
+     */
+    public void deleteAll();
+    /**
+     * @description 批量插入
+     * @param
+     * @see
+     * @author jijj
+     * @createTime 2021/5/3 17:58
+     */
+    public void insertAll(List<SysStock> list);
+
+    public void deleteIsNull();
 }

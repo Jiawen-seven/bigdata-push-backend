@@ -150,4 +150,8 @@ public class SysStockDayController extends BaseController
     public AjaxResult getSystemStockData(@PathVariable String symbol){
         return AjaxResult.success(sysStockDayService.getSystemStockData(symbol));
     }
+    @GetMapping("/getRecommendStockList/{symbol}")
+    public AjaxResult getRecommendStockList(@PathVariable String symbol){
+        return AjaxResult.success(sysStockDayService.selectRecommendStock(symbol));
+    }
 }
