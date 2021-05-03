@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.utils.StringUtils;
 
+import java.time.LocalDateTime;
+
 /**
  * 定时任务调度测试
  * 
@@ -60,7 +62,12 @@ public class RyTask
     * 定时更新股票数据
     * */
     public void getStockRealData(){
-        xueQiuRequest.getStockRealData();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        int weekDay = localDateTime.getDayOfWeek().getValue();
+        int hour = localDateTime.getHour();
+        if(weekDay<=5 && hour>=9 && hour<=18){
+            xueQiuRequest.getStockRealData();
+        }
     }
     /*
     * 1小时更新热榜数据

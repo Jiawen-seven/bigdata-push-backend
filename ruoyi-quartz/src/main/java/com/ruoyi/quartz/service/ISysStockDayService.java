@@ -149,4 +149,12 @@ public interface ISysStockDayService
      * @createTime 2021/5/1 23:48
      */
     List<StockComment> getCommentList(String symbol);
+    /**
+     * @description 获取股票数据用于系统推荐
+     * @param
+     * @see JSONObject
+     * @author jijj
+     * @createTime 2021/5/2 22:44
+     */
+    JSONObject getSystemStockData(String symbol);
 }

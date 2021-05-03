@@ -146,4 +146,8 @@ public class SysStockDayController extends BaseController
     public AjaxResult getCommentList(@PathVariable String symbol){
         return AjaxResult.success(sysStockDayService.getCommentList(symbol));
     }
+    @GetMapping("/getSystemStockData/{symbol}")
+    public AjaxResult getSystemStockData(@PathVariable String symbol){
+        return AjaxResult.success(sysStockDayService.getSystemStockData(symbol));
+    }
 }

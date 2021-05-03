@@ -55,7 +55,7 @@ public class XueQiuRequest {
                 .header("authority","stock.xueqiu.com")
                 .header("accept","application/json, text/plain, */*")
                 .header("origin","https://xueqiu.com")
-                .header("cookie","xq_a_token=cc6a2aedef8a96868eb7257aef4a2ba6e222d2c6; xqat=cc6a2aedef8a96868eb7257aef4a2ba6e222d2c6; xq_r_token=3e168659e8b7d1863aff7a493cfc3398f438abe3; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTYxOTkyMzQ2NiwiY3RtIjoxNjE4MTM1MTUwMDMzLCJjaWQiOiJkOWQwbjRBWnVwIn0.dBBkrHufqFD7BbgRJLIdZJ7Udu0F-rzME6Eizy5Dki9MGmNqWg6vALuJ8EH5PNXN_pVXJJBpNZx45Vnnn3M0SVYetv32dy4_ayf3pk2qSkCzuEDaSoFEl0AMs_3gShTtz6rx_5A19qQzp4ul2laOP5_xxP_GYQGf1GkNQ_A-gutTz6KZ0nF9zmBU2_Nsj82e5_42RWfn7u2C2FBCybif-RMKmght546wO0yqMwesBMBvlADJV8LkbQnHsSKI3kbFBXKsoXWvmZVpQEBxCdRSCiNDVGCSZJDbefo36CNbayLwwdyW6GBqtxocf5wzlvwkdpHH9A8U5F1OdGDt9u_A6Q; u=441618135173095; device_id=24700f9f1986800ab4fcc880530dd0ed; Hm_lvt_1db88642e346389874251b5a1eded6e3=1616988967,1617073971,1618135169,1618136501; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1618136501")
+                .header("cookie","device_id=24700f9f1986800ab4fcc880530dd0ed; s=ds16j26q5y; xq_a_token=4b4d3f5b97e67b975f4e1518dc4c417ebf0ad4c4; xqat=4b4d3f5b97e67b975f4e1518dc4c417ebf0ad4c4; xq_r_token=960e1d453ab676f85fa80d2d41b80edebfde8cc0; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTYyMjUxNTc5MiwiY3RtIjoxNjE5OTUxODY4MjI5LCJjaWQiOiJkOWQwbjRBWnVwIn0.BiW3-k89W_ig7a_7Q2M0ch0YreGQdETnKU0SOnTJ3h1vJ1A7kn6hE_nJ_ZL6THU-5aM_qWGZI6lF_K97EArnaW5fylvPZoXkspaOe-MMdl_FmKppQaGmY17_BNflgoRuYtQdrS04z8D3spGg0VutfQiFr8UMCF7rjs0H83NJBYOUmxUWLo5r3VxuqDLyqFAHoLqhzv24lRluWso61CcbDmQrZU9rkSYOgnQhLNNIq45EfMWTwTwmMn-Cmz6QsrePLsw0dxTJ9xnhedi0KktKh5rt_gZ81WKCQ8pZiwaWNRBDP61LSvT8EzEXW5duOAq9sOQoK-AvejXc1BJyFZmfiw; u=781619951916831; Hm_lvt_1db88642e346389874251b5a1eded6e3=1619763471,1619836834,1619923738,1619951917; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1619952005")
                 .timeout(3000)//超时，毫秒
                 .execute().body());
     }
@@ -210,7 +210,7 @@ public class XueQiuRequest {
     * 获取1小时热榜数据和24小时热榜数据
     * */
     public void getHourDataList(){
-        String oneHourURL = "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=8&_type=12&type=12";
+        String oneHourURL = "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=8&_type=10&type=10";
         String twentyFourURL = "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=8&_type=12&type=22";
         redisCache.setCacheObject(RequestConstants.XUE_QIU_ONE_HOUR,getApiJson(oneHourURL));
         redisCache.setCacheObject(RequestConstants.XUE_QIU_TWENTY_FOUR,getApiJson(twentyFourURL));

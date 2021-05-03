@@ -1,6 +1,7 @@
 package com.ruoyi.quartz.util;
 
 import com.ruoyi.quartz.entity.MailEntity;
+import com.ruoyi.quartz.entity.StockComment;
 import com.ruoyi.quartz.entity.StockInfo;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public class EmailTableUtils {
 
-    public static MailEntity getTableBody(List<String> stocks, String name, String symbol){
+    public static MailEntity getTableBody(List<String> stocks, String name, String symbol,List<StockComment> stockCommentList){
         StringBuilder builder = new StringBuilder();
         builder.append("<table border=\"2\" cellspacing=\"0\"><caption>"+name+"("+symbol+")</caption><tr>");
         //拼接标题
@@ -31,7 +32,27 @@ public class EmailTableUtils {
         MailEntity mailEntity  = new MailEntity();
         mailEntity.setContent(builder.toString());
         mailEntity.setSymbol(symbol);
+        setStockComment(stockCommentList,mailEntity);
         return mailEntity;
+    }
+    public static void setStockComment(List<StockComment> stockCommentList,MailEntity mailEntity){
+        if(stockCommentList!=null && stockCommentList.size()>0){
+            StringBuilder builder = new StringBuilder();
+            builder.append("<h2>资深股评</h2>");
+            stockCommentList.forEach(s->{
+                //添加头像和用户名
+                builder.append("<div style=\"display:flex;align-items:center\">" +
+                        "<img src=\""+s.getAvatar()+"\" style=\"width:60px\">" +
+                        "<span style=\"margin-left:10px\">"+s.getScreenName()+"</span>" +
+                        "</div>");
+                //添加股评
+                builder.append("<div style=\"width:500px\">" +
+                        s.getText()+
+                        "</div>");
+            });
+            //追加内容
+            mailEntity.setContent(mailEntity.getContent()+builder.toString());
+        }
     }
     /*
     * 四舍五入

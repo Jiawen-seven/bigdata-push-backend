@@ -31,4 +31,8 @@ public class RequestConstants {
     * 存储股评的键
     * */
     public final static String XUE_QIU_COMMENT="xue_qiu_comment";
+    /*
+    * 存储昨日的收盘数用于系统推荐
+    * */
+    public final static String XUE_QIU_LAST_DAY="xue_qiu_last_day";
 }

@@ -19,6 +19,7 @@ import com.ruoyi.quartz.domain.VolumeRatioEps;
 import com.ruoyi.quartz.domain.XueQiu;
 import com.ruoyi.quartz.entity.*;
 import com.ruoyi.quartz.mapper.SysStockDayMapper;
+import com.ruoyi.quartz.request.XueQiuRequest;
 import com.ruoyi.quartz.service.ISysEmailService;
 import com.ruoyi.quartz.service.ISysStockDayService;
 import com.ruoyi.quartz.util.EmailTableUtils;
@@ -26,6 +27,8 @@ import com.ruoyi.quartz.util.PageUtils;
 import com.ruoyi.quartz.util.RedBlackListUtils;
 import com.ruoyi.system.domain.SysUserRegistered;
 import com.ruoyi.system.service.ISysUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SysStockDayServiceImpl implements ISysStockDayService
 {
+    private static final Logger log = LoggerFactory.getLogger(SysStockDayServiceImpl.class);
     @Autowired
     private SysStockDayMapper sysStockDayMapper;
 
@@ -268,10 +272,13 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     public void sendStockInfoToMail() {
         List<String> symbols = sysUserService.getUserStocks();
         List<MailEntity> mailEntityList = new ArrayList<>();
+        Map<String,String> map = new HashMap<>();
         symbols.forEach(s->{
             if(StringUtils.isNotEmpty(s)){
                 JSONObject json  = JSONObject.parseObject(redisCache.getCacheObject(RequestConstants.XUE_QIU_REAL_TIME+s));
-                if(json!=null){
+                List<StockComment> stockCommentList = redisCache.getCacheList(RequestConstants.XUE_QIU_COMMENT+s);
+                if(json!=null && json.size()>0){
+                    JSONObject obj = new JSONObject();
                     List<String> stockInfos = new ArrayList<>();
                     String name  = json.getJSONObject("quote").getString("name");
                     String symbol  = json.getJSONObject("quote").getString("symbol");
@@ -279,11 +286,20 @@ public class SysStockDayServiceImpl implements ISysStockDayService
                         String value = json.getJSONObject("quote").getString(stockInfo.getCode());
                         String code = stockInfo.getCode();
                         stockInfos.add(EmailTableUtils.formatValue(value,code));
+                        if(value!=null){
+                            obj.put(code,Double.valueOf(value));
+                        }else{
+                            obj.put(code,0);
+                        }
                     }
-                    mailEntityList.add(EmailTableUtils.getTableBody(stockInfos,name,symbol));
+                    map.put(s,obj.toJSONString());
+                    mailEntityList.add(EmailTableUtils.getTableBody(stockInfos,name,symbol,stockCommentList));
                 }
             }
         });
+        redisCache.deleteObject(RequestConstants.XUE_QIU_LAST_DAY);
+        log.info("删除Redis的键值:"+RequestConstants.XUE_QIU_LAST_DAY);
+        redisCache.setCacheMap(RequestConstants.XUE_QIU_LAST_DAY,map);
         List<SysUserRegistered> userRegisteredList = sysUserService.selectAllRegisteredUser();
         sysEmailService.sendMail(mailEntityList,userRegisteredList);
     }
@@ -318,6 +334,12 @@ public class SysStockDayServiceImpl implements ISysStockDayService
     @Override
     public List<StockComment> getCommentList(String symbol) {
         return redisCache.getCacheList(RequestConstants.XUE_QIU_COMMENT+symbol);
+    }
+
+    @Override
+    public JSONObject getSystemStockData(String symbol) {
+        Map<String,String> map = redisCache.getCacheMap(RequestConstants.XUE_QIU_LAST_DAY);
+        return JSONObject.parseObject(map.get(symbol));
     }
 
     public List<StockComment> computedComment(List<XueQiu> xueQiuList){
