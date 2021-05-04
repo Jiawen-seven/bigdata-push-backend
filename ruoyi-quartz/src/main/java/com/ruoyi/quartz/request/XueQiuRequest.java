@@ -215,41 +215,75 @@ public class XueQiuRequest {
     * */
     public void getDayK(){
         List<String> symbols = sysUserService.getUserStocks();
-        List<JSONArray> arrays = new ArrayList<>();
         symbols.forEach(s->{
             if(StringUtils.isNotEmpty(s)){
+                List<JSONArray> arrays = new ArrayList<>();
                 JSONObject jsonObject = getDayKUrl(s);
-                JSONArray array = jsonObject.getJSONArray("item");
-                for(int i=0;i<array.size();i++){
-                    JSONArray arr = array.getJSONArray(i);
-                    long timestamp = arr.getLong(0);
-                    JSONArray list = new JSONArray();
-                    String date = DateUtils.dateTime(new Date(timestamp));
-                    Double open = arr.getDouble(2);
-                    Double close = arr.getDouble(5);
-                    Double low = arr.getDouble(4);
-                    Double high = arr.getDouble(3);
-                    Double volume = arr.getDouble(1);
-                    list.add(date);
-                    list.add(open);
-                    list.add(close);
-                    list.add(low);
-                    list.add(high);
-                    list.add(volume);
-                    arrays.add(list);
-                }
+                setList(jsonObject,arrays,null);
                 redisCache.deleteObject(RequestConstants.XUE_QIU_DAY_K+s);
                 redisCache.setCacheList(RequestConstants.XUE_QIU_DAY_K+s,arrays);
             }
         });
     }
+    /*
+    * 获取分K线图
+    * */
+    public void getMinK(){
+        List<String> symbols = sysUserService.getUserStocks();
+        symbols.forEach(s->{
+            if(StringUtils.isNotEmpty(s)){
+                List<JSONArray> arrays = new ArrayList<>();
+                JSONObject jsonObject = getMinKUrl(s);
+                setList(jsonObject,arrays,DateUtils.YYYY_MM_DD_HH_MM_SS);
+                redisCache.deleteObject(RequestConstants.XUE_QIU_MIN_K+s);
+                redisCache.setCacheList(RequestConstants.XUE_QIU_MIN_K+s,arrays);
+            }
+        });
+    }
 
+    /*
+    * 循环设定List
+    * */
+    public void setList(JSONObject jsonObject,List<JSONArray> arrays,String format){
+        JSONArray array = jsonObject.getJSONArray("item");
+        for(int i=0;i<array.size();i++){
+            JSONArray arr = array.getJSONArray(i);
+            long timestamp = arr.getLong(0);
+            JSONArray list = new JSONArray();
+            String date = "";
+            if(format==null){
+                date = DateUtils.dateTime(new Date(timestamp));
+            }else{
+                date = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD_HH_MM_SS,new Date(timestamp));
+            }
+            Double open = arr.getDouble(2);
+            Double close = arr.getDouble(5);
+            Double low = arr.getDouble(4);
+            Double high = arr.getDouble(3);
+            Double volume = arr.getDouble(1);
+            list.add(date);
+            list.add(open);
+            list.add(close);
+            list.add(low);
+            list.add(high);
+            list.add(volume);
+            arrays.add(list);
+        }
+    }
     /*
     * 获取日K线图爬取链接
     * */
     public JSONObject getDayKUrl(String symbol){
         long timestamp = System.currentTimeMillis();
         String URL="https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol="+symbol+"&begin="+timestamp+"&period=day&type=before&count=-284&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance";
+        return JSONObject.parseObject(getApiJson(URL)).getJSONObject("data");
+    }
+    /*
+    * 获取1分钟K线图爬取对象
+    * */
+    public JSONObject getMinKUrl(String symbol){
+        long timestamp = System.currentTimeMillis();
+        String URL="https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol="+symbol+"&begin="+timestamp+"&period=1m&type=before&count=-284&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance";
         return JSONObject.parseObject(getApiJson(URL)).getJSONObject("data");
     }
     /**

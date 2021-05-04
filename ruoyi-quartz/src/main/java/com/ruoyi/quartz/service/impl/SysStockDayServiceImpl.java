@@ -353,6 +353,11 @@ public class SysStockDayServiceImpl implements ISysStockDayService
         return sysStockDayMapper.selectRecommendStock(map);
     }
 
+    @Override
+    public List<JSONArray> getMinK(String symbol) {
+        return redisCache.getCacheList(RequestConstants.XUE_QIU_MIN_K+symbol);
+    }
+
     public List<StockComment> computedComment(List<XueQiu> xueQiuList){
         List<StockComment> stockCommentList = new ArrayList<>();
         for(XueQiu xueQiu:xueQiuList){

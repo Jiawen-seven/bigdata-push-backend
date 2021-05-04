@@ -159,4 +159,6 @@ public interface ISysStockDayService
     JSONObject getSystemStockData(String symbol);
     //获取推荐股票列表
     List<SysStockDay> selectRecommendStock(String symbol);
+    //获取分K线图数据
+    List<JSONArray> getMinK(String symbol);
 }

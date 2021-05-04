@@ -28,6 +28,10 @@ public class RequestConstants {
     * */
     public final static String XUE_QIU_DAY_K="xue_qiu_day_k";
     /*
+    * 分K线数据
+    * */
+    public final static String XUE_QIU_MIN_K="xue_qiu_min_k";
+    /*
     * 存储股评的键
     * */
     public final static String XUE_QIU_COMMENT="xue_qiu_comment";

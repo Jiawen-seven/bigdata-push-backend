@@ -88,6 +88,12 @@ public class RyTask
         xueQiuRequest.getDayK();
     }
     /*
+    * 定时更新分K线
+    * */
+    public void getMinK(){
+        xueQiuRequest.getMinK();
+    }
+    /*
     * 定时爬取股评
     * */
     public void spiderStockComment(){
