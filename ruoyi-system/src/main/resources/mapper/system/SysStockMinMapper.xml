@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysStockMinMapper">
+    
+    <resultMap type="SysStockMin" id="SysStockMinResult">
+        <result property="id"    column="id"    />
+        <result property="current"    column="current"    />
+        <result property="percent"    column="percent"    />
+        <result property="chg"    column="chg"    />
+        <result property="avgPrice"    column="avg_price"    />
+        <result property="volume"    column="volume"    />
+        <result property="insertTime"    column="insert_time"    />
+        <result property="isDelete"    column="is_delete"    />
+        <result property="symbol"    column="symbol"    />
+        <result property="name"    column="name"    />
+    </resultMap>
+
+    <sql id="selectSysStockMinVo">
+        select id, current, percent, chg, avg_price, volume, insert_time, is_delete, symbol, name from sys_stock_min
+    </sql>
+
+    <select id="selectSysStockMinList" parameterType="SysStockMin" resultMap="SysStockMinResult">
+        <include refid="selectSysStockMinVo"/>
+        <where>  
+            <if test="current != null "> and current = #{current}</if>
+            <if test="percent != null "> and percent = #{percent}</if>
+            <if test="chg != null "> and chg = #{chg}</if>
+            <if test="avgPrice != null "> and avg_price = #{avgPrice}</if>
+            <if test="volume != null "> and volume = #{volume}</if>
+            <if test="insertTime != null "> and insert_time = #{insertTime}</if>
+            <if test="isDelete != null  and isDelete != ''"> and is_delete = #{isDelete}</if>
+            <if test="symbol != null  and symbol != ''"> and symbol = #{symbol}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectSysStockMinById" parameterType="Long" resultMap="SysStockMinResult">
+        <include refid="selectSysStockMinVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysStockMin" parameterType="SysStockMin" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_stock_min
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="current != null">current,</if>
+            <if test="percent != null">percent,</if>
+            <if test="chg != null">chg,</if>
+            <if test="avgPrice != null">avg_price,</if>
+            <if test="volume != null">volume,</if>
+            <if test="insertTime != null">insert_time,</if>
+            <if test="isDelete != null">is_delete,</if>
+            <if test="symbol != null">symbol,</if>
+            <if test="name != null">name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="current != null">#{current},</if>
+            <if test="percent != null">#{percent},</if>
+            <if test="chg != null">#{chg},</if>
+            <if test="avgPrice != null">#{avgPrice},</if>
+            <if test="volume != null">#{volume},</if>
+            <if test="insertTime != null">#{insertTime},</if>
+            <if test="isDelete != null">#{isDelete},</if>
+            <if test="symbol != null">#{symbol},</if>
+            <if test="name != null">#{name},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysStockMin" parameterType="SysStockMin">
+        update sys_stock_min
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="current != null">current = #{current},</if>
+            <if test="percent != null">percent = #{percent},</if>
+            <if test="chg != null">chg = #{chg},</if>
+            <if test="avgPrice != null">avg_price = #{avgPrice},</if>
+            <if test="volume != null">volume = #{volume},</if>
+            <if test="insertTime != null">insert_time = #{insertTime},</if>
+            <if test="isDelete != null">is_delete = #{isDelete},</if>
+            <if test="symbol != null">symbol = #{symbol},</if>
+            <if test="name != null">name = #{name},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateAllSysStockMin">
+        update sys_stock_min set is_delete = 'Y'
+    </update>
+
+    <delete id="deleteSysStockMinById" parameterType="Long">
+        delete from sys_stock_min where id = #{id}
+    </delete>
+
+    <delete id="deleteSysStockMinByIds" parameterType="String">
+        delete from sys_stock_min where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,5 +1,6 @@
 package com.ruoyi.quartz.task;
 
+import com.ruoyi.framework.web.service.SysPhoneService;
 import com.ruoyi.quartz.request.XueQiuRequest;
 import com.ruoyi.quartz.service.ISysStockDayService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class RyTask
 
     @Autowired
     private ISysStockDayService sysStockDayService;
+
+    @Autowired
+    private SysPhoneService sysPhoneService;
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i)
     {
@@ -112,4 +116,17 @@ public class RyTask
         xueQiuRequest.updateSysStockData();
         xueQiuRequest.updateSysStockType();
     }
+    /*
+    * 定时发送短信
+    * */
+    public void sendStockSms(){
+        sysPhoneService.sendStockSms();
+    }
+    /*
+    * 定时软删除sys_stock_min表中的数据
+    * */
+    public void updateSysStockMin(){
+        xueQiuRequest.updateSysStockMin();
+    }
 }
+

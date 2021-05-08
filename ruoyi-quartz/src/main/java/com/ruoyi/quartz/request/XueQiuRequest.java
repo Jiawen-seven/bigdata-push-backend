@@ -4,6 +4,7 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.RequestConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
@@ -16,8 +17,10 @@ import com.ruoyi.quartz.domain.XueQiu;
 import com.ruoyi.quartz.entity.SysIndustry;
 import com.ruoyi.quartz.service.ISysStockDayService;
 import com.ruoyi.system.domain.SysStock;
+import com.ruoyi.system.domain.SysStockMin;
 import com.ruoyi.system.mapper.SysStockMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.service.ISysStockMinService;
 import com.ruoyi.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +57,9 @@ public class XueQiuRequest {
 
     @Autowired
     private XueQiuDao xueQiuDao;
+
+    @Autowired
+    private ISysStockMinService sysStockMinService;
 
     public String getApiJson(String url){
         return (HttpRequest.get(url)
@@ -186,8 +192,10 @@ public class XueQiuRequest {
         symbols.forEach(s->{
             if(StringUtils.isNotEmpty(s)){
                 redisCache.deleteObject(RequestConstants.XUE_QIU_REAL_TIME+s);
+                JSONObject jsonObject = SplicingURL(s);
                 redisCache.setCacheObject(
-                        RequestConstants.XUE_QIU_REAL_TIME+s,SplicingURL(s).toJSONString());
+                        RequestConstants.XUE_QIU_REAL_TIME+s,jsonObject.toJSONString());
+                insertStockMin(s,jsonObject);
             }
         });
     }
@@ -200,6 +208,39 @@ public class XueQiuRequest {
         data.put("quote",quote);
         data.put("others",others);
         return data;
+    }
+    /*获取SysStockMin对象，根据时间段执行9:30-11:30 13:00-15:00*/
+    public void insertStockMin(String symbol,JSONObject jsonObject){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        int hour = localDateTime.getHour();
+        int min = localDateTime.getMinute();
+        if((hour>=9&&min>=30)&&(hour<=11&&min<=30) || (hour>=13&&hour<=15)){
+            SysStockMin sysStockMin = new SysStockMin();
+            sysStockMin.setInsertTime(new Date());
+            sysStockMin.setSymbol(symbol);
+            sysStockMin.setCurrent(jsonObject.getBigDecimal("current"));
+            sysStockMin.setName(jsonObject.getString("name"));
+            sysStockMin.setPercent(jsonObject.getBigDecimal("percent"));
+            sysStockMin.setChg(jsonObject.getBigDecimal("chg"));
+            sysStockMin.setAvgPrice(jsonObject.getBigDecimal("avg_price"));
+            sysStockMin.setVolume(jsonObject.getBigDecimal("volume"));
+            sysStockMin.setIsDelete("N");
+            sysStockMinService.insertSysStockMin(sysStockMin);
+        }else{
+            log.info("当前不在工作时间，不插入sys_stock_min表");
+        }
+
+    }
+    /*
+    * 定时删除(软删除)
+    * */
+    @Log(title = "定时软删除sys_stock_min")
+    public void updateSysStockMin(){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        int weekDay = localDateTime.getDayOfWeek().getValue();
+        if(weekDay<=5){
+            sysStockMinService.updateAllSysStockMin();
+        }
     }
     /*
     * 获取1小时热榜数据和24小时热榜数据
@@ -242,7 +283,7 @@ public class XueQiuRequest {
     }
 
     /*
-    * 循环设定List
+    * 循环设定List,flag true为日K，false为分K
     * */
     public void setList(JSONObject jsonObject,List<JSONArray> arrays,String format){
         JSONArray array = jsonObject.getJSONArray("item");
@@ -266,7 +307,7 @@ public class XueQiuRequest {
             list.add(close);
             list.add(low);
             list.add(high);
-            list.add(volume);
+            list.add(String.valueOf(volume));
             arrays.add(list);
         }
     }
