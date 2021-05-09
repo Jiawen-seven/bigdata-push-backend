@@ -63,14 +63,13 @@ public class SysPhoneService {
     public void sendStockSms(String symbol,String name,String phoneNumber) throws Exception{
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("number", phoneNumber);
-        params.put("templateId", "5016");
+        params.put("templateId", "5025");
         String[] templateParams = new String[2];
         templateParams[0] = name;
         templateParams[1] = symbol;
 //        templateParams[1] = "http://mrw.so/5t4zMB";
         params.put("templateParams", templateParams);
         String result = zhenziSmsClient.send(params);
-        System.out.println("result:"+result);
         JSONObject jsonObject = JSONObject.parseObject(result);
         if((int)jsonObject.get("code")==0){
             log.info("发送成功："+phoneNumber);
@@ -80,11 +79,16 @@ public class SysPhoneService {
     }
     public void sendStockSms(){
         List<SysUserRegistered> userRegisteredList = sysUserService.selectAllRegisteredUser();
+        System.out.println("--------userRegisteredList---------");
+        userRegisteredList = userRegisteredList.stream().filter(u->u.getStockReminds().contains("0")).collect(Collectors.toList());
+        System.out.println(userRegisteredList.size());
+        System.out.println(userRegisteredList);
         try {
             for(SysUserRegistered u:userRegisteredList){
                 SysStock sysStock = sysStockMapper.selectSysStockById(u.getStockType());
 //                System.out.println("股票:"+sysStock.getValue()+","+sysStock.getName()+","+u.getPhone());
-                sendStockSms(sysStock.getValue(),sysStock.getName(),u.getPhone());
+                sendStockSms(sysStock.getName(),u.getName(),u.getPhone());
+                log.info("发送短信用户:"+u.getName()+","+"手机号:"+u.getPhone());
             }
         }catch (Exception e){
             log.error(e.getMessage());

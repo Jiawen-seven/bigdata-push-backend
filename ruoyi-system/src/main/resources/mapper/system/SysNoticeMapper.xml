@@ -40,6 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				AND create_by like concat('%', #{createBy}, '%')
 			</if>
 		</where>
+		order by update_time desc
     </select>
     
     <insert id="insertNotice" parameterType="SysNotice">
@@ -50,7 +51,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="status != null and status != '' ">status, </if>
 			<if test="remark != null and remark != ''">remark,</if>
  			<if test="createBy != null and createBy != ''">create_by,</if>
- 			create_time
+ 			create_time,
+ 			update_time
  		)values(
 			<if test="noticeTitle != null and noticeTitle != ''">#{noticeTitle}, </if>
 			<if test="noticeType != null and noticeType != ''">#{noticeType}, </if>
@@ -58,7 +60,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="status != null and status != ''">#{status}, </if>
 			<if test="remark != null and remark != ''">#{remark},</if>
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
- 			sysdate()
+ 			sysdate(),sysdate()
 		)
     </insert>
 	 
