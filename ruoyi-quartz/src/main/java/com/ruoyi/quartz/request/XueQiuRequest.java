@@ -195,7 +195,7 @@ public class XueQiuRequest {
                 JSONObject jsonObject = SplicingURL(s);
                 redisCache.setCacheObject(
                         RequestConstants.XUE_QIU_REAL_TIME+s,jsonObject.toJSONString());
-                insertStockMin(s,jsonObject);
+                insertStockMin(s,jsonObject.getJSONObject("quote"));
             }
         });
     }
@@ -214,16 +214,16 @@ public class XueQiuRequest {
         LocalDateTime localDateTime = LocalDateTime.now();
         int hour = localDateTime.getHour();
         int min = localDateTime.getMinute();
-        if((hour>=9&&min>=30)&&(hour<=11&&min<=30) || (hour>=13&&hour<=15)){
+        if((hour==9&&min>=30)||(hour>=10)||(hour==11&&min<=30) || (hour>=13&&hour<=15)){
             SysStockMin sysStockMin = new SysStockMin();
             sysStockMin.setInsertTime(new Date());
             sysStockMin.setSymbol(symbol);
-            sysStockMin.setCurrent(jsonObject.getBigDecimal("current"));
+            sysStockMin.setCurrent(jsonObject.getDouble("current"));
             sysStockMin.setName(jsonObject.getString("name"));
-            sysStockMin.setPercent(jsonObject.getBigDecimal("percent"));
-            sysStockMin.setChg(jsonObject.getBigDecimal("chg"));
-            sysStockMin.setAvgPrice(jsonObject.getBigDecimal("avg_price"));
-            sysStockMin.setVolume(jsonObject.getBigDecimal("volume"));
+            sysStockMin.setPercent(jsonObject.getDouble("percent"));
+            sysStockMin.setChg(jsonObject.getDouble("chg"));
+            sysStockMin.setAvgPrice(jsonObject.getDouble("avg_price"));
+            sysStockMin.setVolume(jsonObject.getDouble("volume"));
             sysStockMin.setIsDelete("N");
             sysStockMinService.insertSysStockMin(sysStockMin);
         }else{

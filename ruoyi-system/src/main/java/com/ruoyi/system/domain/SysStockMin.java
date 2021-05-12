@@ -23,23 +23,23 @@ public class SysStockMin extends BaseEntity
 
     /** 当前价 */
     @Excel(name = "当前价")
-    private BigDecimal current;
+    private Double current;
 
     /** 涨跌幅 */
     @Excel(name = "涨跌幅")
-    private BigDecimal percent;
+    private Double percent;
 
     /** 涨跌额 */
     @Excel(name = "涨跌额")
-    private BigDecimal chg;
+    private Double chg;
 
     /** 平均价格 */
     @Excel(name = "平均价格")
-    private BigDecimal avgPrice;
+    private Double avgPrice;
 
     /** 每股收益 */
     @Excel(name = "每股收益")
-    private BigDecimal volume;
+    private Double volume;
 
     /** 插入时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -67,48 +67,48 @@ public class SysStockMin extends BaseEntity
     {
         return id;
     }
-    public void setCurrent(BigDecimal current) 
+    public void setCurrent(Double current)
     {
         this.current = current;
     }
 
-    public BigDecimal getCurrent() 
+    public Double getCurrent()
     {
         return current;
     }
-    public void setPercent(BigDecimal percent) 
+    public void setPercent(Double percent)
     {
         this.percent = percent;
     }
 
-    public BigDecimal getPercent() 
+    public Double getPercent()
     {
         return percent;
     }
-    public void setChg(BigDecimal chg) 
+    public void setChg(Double chg)
     {
         this.chg = chg;
     }
 
-    public BigDecimal getChg() 
+    public Double getChg()
     {
         return chg;
     }
-    public void setAvgPrice(BigDecimal avgPrice) 
+    public void setAvgPrice(Double avgPrice)
     {
         this.avgPrice = avgPrice;
     }
 
-    public BigDecimal getAvgPrice() 
+    public Double getAvgPrice()
     {
         return avgPrice;
     }
-    public void setVolume(BigDecimal volume) 
+    public void setVolume(Double volume)
     {
         this.volume = volume;
     }
 
-    public BigDecimal getVolume() 
+    public Double getVolume()
     {
         return volume;
     }
