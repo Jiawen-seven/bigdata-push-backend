@@ -214,7 +214,7 @@ public class XueQiuRequest {
         LocalDateTime localDateTime = LocalDateTime.now();
         int hour = localDateTime.getHour();
         int min = localDateTime.getMinute();
-        if((hour==9&&min>=30)||(hour>=10)||(hour==11&&min<=30) || (hour>=13&&hour<=15)){
+        if((hour==9&&min>=30)||(hour==10)||(hour==11&&min<=30) || (hour>=13&&hour<=15)){
             SysStockMin sysStockMin = new SysStockMin();
             sysStockMin.setInsertTime(new Date());
             sysStockMin.setSymbol(symbol);

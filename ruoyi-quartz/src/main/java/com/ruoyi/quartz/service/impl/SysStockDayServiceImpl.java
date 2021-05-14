@@ -409,12 +409,12 @@ public class SysStockDayServiceImpl implements ISysStockDayService
             boolean is_verify = xueQiu.getVerified_info();
             if(fav_count>=0 &&like_count>=0 &&reply_count>=0 &&retweet_count>=0
                     &&view_count>=0 &&view_count<=5000&&followers_count>0&&followers_count<500&&friends_count<10*followers_count
-                    &&status_count>0 && status_count<1000 && !is_verify){
+                    &&status_count>0 && status_count<1000){
                 stockComment.setFlag(1);
                 stockComment.setDesc("正常股评");
             }else if(fav_count>=0 &&like_count>=0 &&reply_count>=0 &&retweet_count>=0
                     &&view_count>5000&&followers_count>500&&friends_count<followers_count
-                    &&status_count>1000 && is_verify){
+                    &&status_count>1000){
                 stockComment.setFlag(2);
                 stockComment.setDesc("资深股评");
             }

@@ -41,7 +41,11 @@ public class SysStockMinServiceImpl implements ISysStockMinService
     @Override
     public List<SysStockMin> selectSysStockMinList(SysStockMin sysStockMin)
     {
-        return sysStockMinMapper.selectSysStockMinList(sysStockMin);
+        List<SysStockMin> list = sysStockMinMapper.selectSysStockMinList(sysStockMin);
+        list.forEach(obj->{
+            obj.setValue(obj.getCurrent());
+        });
+        return list;
     }
 
     /**

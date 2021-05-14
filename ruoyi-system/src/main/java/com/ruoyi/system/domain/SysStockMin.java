@@ -25,6 +25,8 @@ public class SysStockMin extends BaseEntity
     @Excel(name = "当前价")
     private Double current;
 
+    private Double value;
+
     /** 涨跌幅 */
     @Excel(name = "涨跌幅")
     private Double percent;
@@ -149,19 +151,28 @@ public class SysStockMin extends BaseEntity
         return name;
     }
 
+    public Double getValue() {
+        return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("current", getCurrent())
-            .append("percent", getPercent())
-            .append("chg", getChg())
-            .append("avgPrice", getAvgPrice())
-            .append("volume", getVolume())
-            .append("insertTime", getInsertTime())
-            .append("isDelete", getIsDelete())
-            .append("symbol", getSymbol())
-            .append("name", getName())
-            .toString();
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("current", current)
+                .append("value", value)
+                .append("percent", percent)
+                .append("chg", chg)
+                .append("avgPrice", avgPrice)
+                .append("volume", volume)
+                .append("insertTime", insertTime)
+                .append("isDelete", isDelete)
+                .append("symbol", symbol)
+                .append("name", name)
+                .toString();
     }
 }
