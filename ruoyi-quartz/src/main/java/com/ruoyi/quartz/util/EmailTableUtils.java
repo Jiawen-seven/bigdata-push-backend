@@ -19,7 +19,9 @@ public class EmailTableUtils {
 
     public static MailEntity getTableBody(List<String> stocks, String name, String symbol,List<StockComment> stockCommentList){
         StringBuilder builder = new StringBuilder();
-        builder.append("<table border=\"2\" cellspacing=\"0\"><caption>"+name+"("+symbol+")</caption><tr>");
+        String title= "<p>报告详情请看：<a href='http://q7k.cn/5uXhNz'>http://q7k.cn/5uXhNz</a></p>";
+        builder.append(title);
+        builder.append("<table border=\"2\" cellspacing=\"0\"><caption>").append(name).append("(").append(symbol).append(")</caption><tr>");
         //拼接标题
         for(StockInfo tab: StockInfo.values()){
             builder.append("<th>").append(tab.getDescription()).append("</th>");
